@@ -26,5 +26,13 @@ RUN conda install --channel conda-forge --file pytmc_env.yml
 
 RUN pip install git+https://github.com/slaclab/pytmc.git@${PYTMC_VERSION}
 RUN pip install git+https://github.com/epicsdeb/pypdb.git@4ad4016
+RUN pip install git+https://github.com/slaclab/pydm@v1.7.3
+RUN conda install typhon -c conda-forge -c pcds-tag
+
+# TODO this (especially) needs cleaning
+ENV ADS_IOC_PATH /reg/g/pcds/epics/${BASE_MODULE_VERSION}/ioc/ads-ioc/R0.0.0
+RUN mkdir -p $ADS_IOC_PATH
+RUN git clone --depth 0 file://${GIT_EPICS_TOP}/modules/ads-ioc.git ${ADS_IOC_PATH}
+RUN make -C ${ADS_IOC_PATH} all
 
 ENTRYPOINT ["/bin/bash", "-c"]
