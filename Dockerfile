@@ -26,3 +26,5 @@ RUN conda install --channel conda-forge --file pytmc_env.yml
 
 RUN pip install git+https://github.com/slaclab/pytmc.git@${PYTMC_VERSION}
 RUN pip install git+https://github.com/epicsdeb/pypdb.git@4ad4016
+
+ENTRYPOINT ["/bin/bash", "-c"]
