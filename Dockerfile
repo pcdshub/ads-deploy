@@ -27,6 +27,8 @@ RUN conda install --channel conda-forge --file pytmc_env.yml
 RUN pip install git+https://github.com/slaclab/pytmc.git@${PYTMC_VERSION}
 RUN pip install git+https://github.com/epicsdeb/pypdb.git@4ad4016
 RUN pip install git+https://github.com/slaclab/pydm@v1.7.3
+RUN pip install git+https://github.com/stlehmann/pyads@3.2.0
+
 RUN conda install typhon -c conda-forge -c pcds-tag
 RUN conda install epics-base -c conda-forge
 
