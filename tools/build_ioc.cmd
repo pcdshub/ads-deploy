@@ -11,7 +11,6 @@ CALL %~dp0\config.cmd %1 %2 %3 %4 %5 %6 %7
 
 :Fail
 @echo ** FAILED **
-@echo Some parameters were unset! Did you click the PLC project in Visual Studio before running?
 
 :Done
 @echo Done

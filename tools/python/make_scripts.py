@@ -1,7 +1,6 @@
 import sys
 import pathlib
 
-print(sys.argv[1:])
 stcmd, DeployRoot, SolutionDir, IocMountPath, DockerImage = sys.argv[1:]
 
 ioc_path = pathlib.Path(stcmd).parent.absolute()

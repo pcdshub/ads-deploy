@@ -19,7 +19,6 @@ REM pytmc stcmd --template-path /tmp --template motor_list --plc %SelectedItem% 
 
 :Fail
 @echo ** FAILED **
-@echo Some parameters were unset! Did you click the PLC project in Visual Studio before running?
 
 :Done
 @echo Done
