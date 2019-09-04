@@ -26,7 +26,7 @@
           <CloseOnExit>true</CloseOnExit>
           <Command>c:\repos\ads-deploy\tools\create_iocboot.cmd</Command>
           <Index>1</Index>
-          <InitialDirectory/>
+          <InitialDirectory>$(SolutionDir)</InitialDirectory>
           <IsGUIapp>false</IsGUIapp>
           <NameID>0</NameID>
           <Package>{00000000-0000-0000-0000-000000000000}</Package>
@@ -42,7 +42,7 @@
           <CloseOnExit>true</CloseOnExit>
           <Command>c:\repos\ads-deploy\tools\build_ioc.cmd</Command>
           <Index>2</Index>
-          <InitialDirectory/>
+          <InitialDirectory>$(SolutionDir)</InitialDirectory>
           <IsGUIapp>false</IsGUIapp>
           <NameID>0</NameID>
           <Package>{00000000-0000-0000-0000-000000000000}</Package>
@@ -58,13 +58,13 @@
           <CloseOnExit>true</CloseOnExit>
           <Command>c:\repos\ads-deploy\tools\run_ioc.cmd</Command>
           <Index>3</Index>
-          <InitialDirectory/>
+          <InitialDirectory>$(SolutionDir)</InitialDirectory>
           <IsGUIapp>false</IsGUIapp>
           <NameID>0</NameID>
           <Package>{00000000-0000-0000-0000-000000000000}</Package>
           <PromptForArguments>false</PromptForArguments>
           <SaveAllDocs>true</SaveAllDocs>
-          <Title>&amp;4 pytmc: Run IOC(s)</Title>
+          <Title>&amp;4 pytmc: Build and Run IOC(s)</Title>
           <Unicode>false</Unicode>
           <UseOutputWindow>true</UseOutputWindow>
           <UseTaskList>false</UseTaskList>
@@ -74,7 +74,7 @@
           <CloseOnExit>true</CloseOnExit>
           <Command>C:\repos\ads-deploy\tools\motor_screens.cmd</Command>
           <Index>4</Index>
-          <InitialDirectory/>
+          <InitialDirectory>$(SolutionDir)</InitialDirectory>
           <IsGUIapp>false</IsGUIapp>
           <NameID>0</NameID>
           <Package>{00000000-0000-0000-0000-000000000000}</Package>
