@@ -1,5 +1,4 @@
-# VERSION=$(shell git describe --tags)
-VERSION=v0.0.0
+VERSION=$(shell git describe --tags)
 
 all: image
 
