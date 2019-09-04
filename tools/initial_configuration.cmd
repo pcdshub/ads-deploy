@@ -1,20 +1,23 @@
-CALL %~dp0\config.cmd %1 %2 %3 %4 %5 %6 %7
+@CALL %~dp0\config.cmd %1 %2 %3 %4 %5 %6 %7
 @IF [%ConfigSuccess%] == [0] GOTO Fail
 
-"C:\Program Files\Docker\Docker\resources\bin\docker.exe" run ^
-	-v %DeployRoot%/python:/python ^
-	-v %SolutionDir%:%IocMountPath% ^
-	-i %DockerImage% ^
-	"python /python/find_tsproj.py '/reg/g/pcds/epics/ioc/%SolutionName%/%SolutionFilename%'"
+@echo off
+set IPAddresses=
+@for /f "usebackq tokens=2 delims=:" %%f in (`ipconfig ^| findstr /c:"IPv4 Address"`) do (
+    @call set IPAddresses=%%IPAddresses%%%%f
+)
 
-@echo Opening the deploy configuration script...
-@cd %IOCPath%
-@explorer deploy_config.py
+%RunDocker% %DockerImage% "python /ads-deploy/tools/python/find_tsproj.py '/reg/g/pcds/epics/ioc/%SolutionName%/%SolutionFilename%' %IPAddresses%"
 
-@GOTO Done
+@echo Opening the deploy configuration script in notepad.
+@echo Close notepad when you have updated the settings to continue...
+cd %IOCPath%
+notepad deploy_config.py
+
+@echo Creating IOC boot directories...
+@CALL %~dp0\create_iocboot.cmd %1 %2 %3 %4 %5 %6 %7
+
+@GOTO :eof
 
 :Fail
 @echo ** FAILED - see error messages above **
-
-:Done
-@echo Done

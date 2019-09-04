@@ -1,4 +1,4 @@
-@SET DockerImage=pcdshub/ads-deploy:v0.0.0
+@SET DockerImage=pcdshub/ads-deploy:v0.0.2
 
 @SET DeployRoot=%~dp0
 @SET SolutionDir=%1
@@ -9,6 +9,7 @@
 @SET SolutionName=%SolutionFilename:~0,-4%
 @SET SolutionFullPath="%SolutionDir%%SolutionName%"
 @SET IocMountPath=/reg/g/pcds/epics/ioc/%SolutionName%
+
 
 @echo Solution directory:      %SolutionDir%
 @echo Solution name:           %SolutionName%
@@ -25,3 +26,8 @@
 	@echo Solution filename unset!
 	@SET ConfigSuccess=0
 )
+
+@SET RunDocker=docker run ^
+    -v %DeployRoot%:/ads-deploy/tools ^
+    -v %SolutionDir%:%IocMountPath% ^
+    -i
