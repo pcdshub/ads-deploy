@@ -8,5 +8,9 @@ image:
 push:
 	docker push pcdshub/ads-deploy:$(VERSION)
 
+latest:
+	docker build -t pcdshub/ads-deploy:latest .
+	docker push pcdshub/ads-deploy:latest
 
-.PHONY: all image push
+
+.PHONY: all image push latest
