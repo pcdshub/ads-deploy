@@ -1,4 +1,4 @@
-FROM pcdshub/ads-ioc:v0.0.1-1-ge039050
+FROM pcdshub/ads-ioc:v0.0.2
 
 LABEL maintainer="K Lauer <klauer@slac.stanford.edu>"
 USER root
@@ -16,6 +16,7 @@ RUN yum -y update \
 
 # --- Version settings
 ENV PYTMC_VERSION      v2.0.0rc1
+ENV ADS_IOC_VERSION    v0.0.2
 # --- Version settings
 
 ADD pytmc_env.yml pytmc_env.yml
@@ -33,9 +34,13 @@ RUN conda install typhon -c conda-forge -c pcds-tag
 RUN conda install epics-base -c conda-forge
 
 # TODO this (especially) needs cleaning
-ENV ADS_IOC_PATH /reg/g/pcds/epics/${BASE_MODULE_VERSION}/ioc/ads-ioc/R0.0.0
-RUN mkdir -p $ADS_IOC_PATH
-RUN git clone --depth 0 file://${GIT_EPICS_TOP}/modules/ads-ioc.git ${ADS_IOC_PATH}
+ENV ADS_IOC_ROOT /reg/g/pcds/epics/${BASE_MODULE_VERSION}/ioc/ads-ioc
+ENV ADS_IOC_PATH ${ADS_IOC_ROOT}/${ADS_IOC_VERSION}
+WORKDIR ${ADS_IOC_ROOT}
+
+RUN cp -R /epics/iocs/ads-ioc/ ${ADS_IOC_PATH}
+RUN ls $ADS_IOC_PATH
 RUN make -C ${ADS_IOC_PATH} all
 
+WORKDIR ${ADS_IOC_PATH}
 ENTRYPOINT ["/bin/bash", "-c"]
