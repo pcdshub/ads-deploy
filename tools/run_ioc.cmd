@@ -1,9 +1,6 @@
 @CALL %~dp0\build_ioc.cmd %1 %2 %3 %4 %5 %6 %7
 @IF [%ConfigSuccess%] == [0] GOTO Fail
-
-@echo Creating run-ioc-in-docker.cmd script...
-
-%RunDocker% %DockerImage% "find %IocMountPath%/iocBoot -type f -name st.cmd -exec python /ads-deploy/tools/python/make_scripts.py {} '%DeployRoot%' '%SolutionDir%' '%IocMountPath%' '%DockerImage%' \;"
+@CALL %~dp0\make_scripts.cmd %1 %2 %3 %4 %5 %6 %7
 
 @echo Running the IOC(s)...
 @pushd %SolutionDir%\iocBoot

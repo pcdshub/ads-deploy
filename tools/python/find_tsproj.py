@@ -38,12 +38,12 @@ with open(solution_path / "deploy_config.py", 'wt', newline='\r\n') as f:
         comment = '' if index == 0 else '# '
         print(f'{comment}local_net_id = "{ip_address}.1.1"', file=f)
     if len(ip_addresses) > 1:
-        print('\n' * 4)
+        print()
         print('* NOTE *')
         print('Multiple IP addresses found. You may need to specify '
               'the correct local_net_id in deploy_config.py')
         print('* NOTE *')
-        print('\n' * 4)
+        print()
 
         print('# TODO: check local_net_id above; it should match Windows',
               file=f)

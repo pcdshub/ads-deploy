@@ -10,12 +10,17 @@
 @SET SolutionFullPath="%SolutionDir%%SolutionName%"
 @SET IocMountPath=/reg/g/pcds/epics/ioc/%SolutionName%
 
-
-@echo Solution directory:      %SolutionDir%
-@echo Solution name:           %SolutionName%
-@echo Solution filename:       %SolutionFilename%
-@echo Solution full path:      %SolutionFullPath%
-@echo IOC mount path:          %IocMountPath%
+@if not [%AdsDeployConfigured%] == [1] (
+	@echo off
+	@echo ----------------------------------------------------------------------
+	@echo Solution directory:      %SolutionDir%
+	@echo Solution name:           %SolutionName%
+	@echo Solution filename:       %SolutionFilename%
+	@echo Solution full path:      %SolutionFullPath%
+	@echo IOC mount path:          %IocMountPath%
+	@echo ----------------------------------------------------------------------
+	@echo.
+)
 
 @SET ConfigSuccess=1
 @IF "%SolutionDir%" == "" (
@@ -31,3 +36,5 @@
     -v %DeployRoot%:/ads-deploy/tools ^
     -v %SolutionDir%:%IocMountPath% ^
     -i
+
+@SET AdsDeployConfigured=1

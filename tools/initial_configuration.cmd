@@ -1,21 +1,27 @@
 @CALL %~dp0\config.cmd %1 %2 %3 %4 %5 %6 %7
 @IF [%ConfigSuccess%] == [0] GOTO Fail
 
-@echo off
-set IPAddresses=
+@set IPAddresses=
 @for /f "usebackq tokens=2 delims=:" %%f in (`ipconfig ^| findstr /c:"IPv4 Address"`) do (
-    @call set IPAddresses=%%IPAddresses%%%%f
+    call set IPAddresses=%%IPAddresses%%%%f
 )
 
 %RunDocker% %DockerImage% "python /ads-deploy/tools/python/find_tsproj.py '/reg/g/pcds/epics/ioc/%SolutionName%/%SolutionFilename%' %IPAddresses%"
 
 @echo Opening the deploy configuration script in notepad.
 @echo Close notepad when you have updated the settings to continue...
-cd %IOCPath%
-notepad deploy_config.py
+@cd %IOCPath%
+@notepad deploy_config.py
 
-@echo Creating IOC boot directories...
+@echo.
+@echo ---------------------------------------------------
+@echo - Creating IOC boot directories and Makefiles
 @CALL %~dp0\create_iocboot.cmd %1 %2 %3 %4 %5 %6 %7
+
+@echo.
+@echo ---------------------------------------------------
+@echo - Creating IOC boot scripts
+@CALL %~dp0\make_scripts.cmd %1 %2 %3 %4 %5 %6 %7
 
 @GOTO :eof
 
