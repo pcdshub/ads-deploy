@@ -1,4 +1,5 @@
 # vi: sw=4 ts=4 sts=4 expandtab
+import os
 import pathlib
 import re
 import sys
@@ -16,7 +17,10 @@ with open(solution_fn, 'rt') as f:
 
 
 projects = [match[1].replace('\\', '/')
-            for match in project_re.findall(solution_text)]
+            for match in project_re.findall(solution_text)
+            if os.path.splitext(match[1])[1] not in ('.tcmproj', )
+            ]
+
 print('Found projects:\n    ', '\n    '.join(projects), file=sys.stderr)
 
 ip_addresses = [

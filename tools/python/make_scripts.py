@@ -15,7 +15,7 @@ except Exception as ex:
 
 ioc_path = pathlib.Path(stcmd).parent.absolute()
 
-local_net_id = getattr(settings, 'local_net_id', 'UNKNOWN')
+local_net_id = settings.get('local_net_id', 'UNKNOWN')
 
 script = f'''
 @echo Your development environment Net ID is: {local_net_id}
@@ -25,11 +25,28 @@ script = f'''
 @pause
 
 "C:/Program Files/Docker/Docker/resources/bin/docker.exe" run ^
-        -v {DeployRoot}/python:/python ^
+        -v {DeployRoot}:/ads-deploy ^
         -v {SolutionDir}:{IocMountPath} ^
         -i {DockerImage} ^
-        "make -C ${{ADS_IOC_PATH}}/iocBoot/templates && cd {ioc_path} && make && ./st.cmd"
+        "make -C ${{ADS_IOC_PATH}}/iocBoot/templates && cd {ioc_path} && make && sed -i '/^adsIoc_registerRecord.*$/a adsSetLocalAddress({local_net_id})' st.cmd && ./st.cmd"
 '''
 
-with open(ioc_path / 'run-ioc-in-docker.cmd', 'wt') as f:
+with open(ioc_path / 'windows_run-ioc-in-docker.cmd', 'wt') as f:
+    print('\r\n'.join(script.splitlines()), file=f)
+
+
+project = settings.get('projects', ['Unknown'])[0]
+
+script = f'''
+@echo Starting Typhon...
+
+"C:/Program Files/Docker/Docker/resources/bin/docker.exe" run ^
+        -v {DeployRoot}:/ads-deploy/tools ^
+        -v {SolutionDir}:{IocMountPath} ^
+	-e DISPLAY=host.docker.internal:0.0 ^
+	-i {DockerImage} ^
+	"cd {IocMountPath} && eval $(python /ads-deploy/tools/python/environment.py) && pytmc stcmd --template-path /ads-deploy/tools/templates --template typhon_display.py --only-motor """{project}""" > /tmp/display.py && python /tmp/display.py"
+'''
+
+with open(ioc_path / 'windows_run-typhon-gui.cmd', 'wt') as f:
     print('\r\n'.join(script.splitlines()), file=f)

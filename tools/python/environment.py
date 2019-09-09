@@ -1,6 +1,7 @@
-from runpy import run_path
-
 import pathlib
+import sys
+
+from runpy import run_path
 
 try:
     settings = run_path("deploy_config.py")
@@ -12,3 +13,4 @@ except Exception as ex:
 
 for project in settings['projects']:
     print('export TSPROJ="{}"'.format(pathlib.Path(project).absolute()))
+    break

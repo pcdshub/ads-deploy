@@ -7,8 +7,8 @@
 
 @echo Running the IOC(s)...
 @pushd %SolutionDir%\iocBoot
-@FORFILES /S /M run-ioc-in-docker.cmd /c "cmd /c Echo running @path..."
-@FORFILES /S /M run-ioc-in-docker.cmd /c "cmd /c start cmd /k @path"
+@FORFILES /S /M windows_run-ioc-in-docker.cmd /c "cmd /c Echo running @path..."
+@FORFILES /S /M windows_run-ioc-in-docker.cmd /c "cmd /c start cmd /k @path"
 @popd
 
 @echo Done

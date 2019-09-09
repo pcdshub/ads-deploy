@@ -4,9 +4,7 @@
 START CMD /K %RunDocker% ^
 	-e DISPLAY=host.docker.internal:0.0 ^
 	-t %DockerImage% ^
-	"echo test; python /ads-deploy/tools/python/display.py"
-
-REM pytmc stcmd --template-path /tmp --template motor_list --plc %SelectedItem% %ProjectFileName%"
+	"cd %IocMountPath% && eval $(python /ads-deploy/tools/python/environment.py) && pytmc stcmd --template-path /ads-deploy/tools/templates --template typhon_display.py --only-motor """${TSPROJ}""" > /tmp/display.py && python /tmp/display.py"
 
 @echo Done
 @GOTO :eof
