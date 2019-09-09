@@ -15,23 +15,7 @@
                     <Package>{00000000-0000-0000-0000-000000000000}</Package>
                     <PromptForArguments>false</PromptForArguments>
                     <SaveAllDocs>true</SaveAllDocs>
-                    <Title>&amp;1 pytmc: Initial configuration</Title>
-                    <Unicode>false</Unicode>
-                    <UseOutputWindow>true</UseOutputWindow>
-                    <UseTaskList>false</UseTaskList>
-                </UserCreatedTool>
-                <UserCreatedTool>
-                    <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
-                    <CloseOnExit>true</CloseOnExit>
-                    <Command>c:\repos\ads-deploy\tools\create_iocboot.cmd</Command>
-                    <Index>1</Index>
-                    <InitialDirectory>$(SolutionDir)</InitialDirectory>
-                    <IsGUIapp>false</IsGUIapp>
-                    <NameID>0</NameID>
-                    <Package>{00000000-0000-0000-0000-000000000000}</Package>
-                    <PromptForArguments>false</PromptForArguments>
-                    <SaveAllDocs>true</SaveAllDocs>
-                    <Title>&amp;2 pytmc: Create iocBoot directories</Title>
+                    <Title>&amp;1 pytmc: Configuration</Title>
                     <Unicode>false</Unicode>
                     <UseOutputWindow>true</UseOutputWindow>
                     <UseTaskList>false</UseTaskList>
@@ -40,14 +24,14 @@
                     <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
                     <CloseOnExit>true</CloseOnExit>
                     <Command>C:\Repos\ads-deploy\tools\lint_pragmas.cmd</Command>
-                    <Index>2</Index>
+                    <Index>1</Index>
                     <InitialDirectory>$(SolutionDir)</InitialDirectory>
                     <IsGUIapp>false</IsGUIapp>
                     <NameID>0</NameID>
                     <Package>{00000000-0000-0000-0000-000000000000}</Package>
                     <PromptForArguments>false</PromptForArguments>
                     <SaveAllDocs>true</SaveAllDocs>
-                    <Title>&amp;3 pytmc: Lint pragmas</Title>
+                    <Title>&amp;2 pytmc: Lint pragmas</Title>
                     <Unicode>false</Unicode>
                     <UseOutputWindow>true</UseOutputWindow>
                     <UseTaskList>false</UseTaskList>
@@ -56,6 +40,22 @@
                     <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
                     <CloseOnExit>true</CloseOnExit>
                     <Command>c:\repos\ads-deploy\tools\build_ioc.cmd</Command>
+                    <Index>2</Index>
+                    <InitialDirectory>$(SolutionDir)</InitialDirectory>
+                    <IsGUIapp>false</IsGUIapp>
+                    <NameID>0</NameID>
+                    <Package>{00000000-0000-0000-0000-000000000000}</Package>
+                    <PromptForArguments>false</PromptForArguments>
+                    <SaveAllDocs>true</SaveAllDocs>
+                    <Title>&amp;3 pytmc: Build IOC(s)</Title>
+                    <Unicode>false</Unicode>
+                    <UseOutputWindow>false</UseOutputWindow>
+                    <UseTaskList>false</UseTaskList>
+                </UserCreatedTool>
+                <UserCreatedTool>
+                    <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
+                    <CloseOnExit>true</CloseOnExit>
+                    <Command>c:\repos\ads-deploy\tools\run_ioc.cmd</Command>
                     <Index>3</Index>
                     <InitialDirectory>$(SolutionDir)</InitialDirectory>
                     <IsGUIapp>false</IsGUIapp>
@@ -63,23 +63,7 @@
                     <Package>{00000000-0000-0000-0000-000000000000}</Package>
                     <PromptForArguments>false</PromptForArguments>
                     <SaveAllDocs>true</SaveAllDocs>
-                    <Title>&amp;4 pytmc: Build IOC(s)</Title>
-                    <Unicode>false</Unicode>
-                    <UseOutputWindow>true</UseOutputWindow>
-                    <UseTaskList>false</UseTaskList>
-                </UserCreatedTool>
-                <UserCreatedTool>
-                    <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
-                    <CloseOnExit>true</CloseOnExit>
-                    <Command>c:\repos\ads-deploy\tools\run_ioc.cmd</Command>
-                    <Index>4</Index>
-                    <InitialDirectory>$(SolutionDir)</InitialDirectory>
-                    <IsGUIapp>false</IsGUIapp>
-                    <NameID>0</NameID>
-                    <Package>{00000000-0000-0000-0000-000000000000}</Package>
-                    <PromptForArguments>false</PromptForArguments>
-                    <SaveAllDocs>true</SaveAllDocs>
-                    <Title>&amp;5 pytmc: Build and Run IOC(s)</Title>
+                    <Title>&amp;4 pytmc: Build and Run IOC(s)</Title>
                     <Unicode>false</Unicode>
                     <UseOutputWindow>true</UseOutputWindow>
                     <UseTaskList>false</UseTaskList>
@@ -88,14 +72,14 @@
                     <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
                     <CloseOnExit>true</CloseOnExit>
                     <Command>C:\repos\ads-deploy\tools\motor_screens.cmd</Command>
-                    <Index>5</Index>
+                    <Index>4</Index>
                     <InitialDirectory>$(SolutionDir)</InitialDirectory>
                     <IsGUIapp>false</IsGUIapp>
                     <NameID>0</NameID>
                     <Package>{00000000-0000-0000-0000-000000000000}</Package>
                     <PromptForArguments>false</PromptForArguments>
                     <SaveAllDocs>true</SaveAllDocs>
-                    <Title>&amp;6 pydm: Motor Screens</Title>
+                    <Title>&amp;5 typhon: Motor Screens</Title>
                     <Unicode>false</Unicode>
                     <UseOutputWindow>true</UseOutputWindow>
                     <UseTaskList>false</UseTaskList>
