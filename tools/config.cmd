@@ -1,4 +1,4 @@
-@SET DockerImage=pcdshub/ads-deploy:v0.0.2
+@SET DockerImage=pcdshub/ads-deploy:v0.0.3
 
 @SET DeployRoot=%~dp0
 @SET SolutionDir=%1
