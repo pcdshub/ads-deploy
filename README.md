@@ -21,8 +21,14 @@ Installation
 Step-by-step notes are available here:
 https://confluence.slac.stanford.edu/display/PCDS/Installing+ads-deploy+on+Windows
 
-Using just the Docker image is simple on all platforms. Run the following to check it out:
+Using just the Docker container is simple on all platforms. Run the following to check it out:
 
+Windows
+```sh
+C:\> docker run -it pcdshub/ads-deploy:latest /bin/bash
+```
+
+OSX / Linux
 ```sh
 $ eval $(docker-machine env)
 $ docker run -it pcdshub/ads-deploy:latest /bin/bash
