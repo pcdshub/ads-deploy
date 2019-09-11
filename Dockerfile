@@ -4,8 +4,9 @@ LABEL maintainer="K Lauer <klauer@slac.stanford.edu>"
 USER root
 
 # Install miniconda3 (adapted from conda/miniconda3-centos7)
+# and also the necessary X11 libraries for pyqt5
 RUN yum -y update \
-    && yum -y install curl bzip2 mesa-libGL libXi \
+    && yum -y install curl bzip2 mesa-libGL libXi libxkbcommon-x11 \
     && curl -sSL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh \
     && bash /tmp/miniconda.sh -bfp /usr/local/ \
     && rm -rf /tmp/miniconda.sh \
