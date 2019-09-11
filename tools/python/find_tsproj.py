@@ -34,16 +34,29 @@ ip_addresses = [
 
 with open(solution_path / "deploy_config.py", 'wt', newline='\r\n') as f:
     print(f'projects = {projects!r}', file=f)
-    for index, ip_address in enumerate(ip_addresses):
-        comment = '' if index == 0 else '# '
-        print(f'{comment}local_net_id = "{ip_address}.1.1"', file=f)
-    if len(ip_addresses) > 1:
-        print()
-        print('* NOTE *')
-        print('Multiple IP addresses found. You may need to specify '
-              'the correct local_net_id in deploy_config.py')
-        print('* NOTE *')
-        print()
+    ip_error = None
+    if not ip_addresses:
+        print(f'local_net_id = "UNKNOWN"', file=f)
+        ip_error = '\n'.join(
+            ('Unable to find an IP address to match with the local net ID.',
+             'This must be set for the IOC to work.')
+        )
+    else:
+        for index, ip_address in enumerate(ip_addresses):
+            comment = '' if index == 0 else '# '
+            print(f'{comment}local_net_id = "{ip_address}.1.1"', file=f)
 
+        if len(ip_addresses) > 1:
+            ip_error = '\n'.join(
+                ('Multiple IP addresses found. You may need to specify ',
+                 'the correct local_net_id in deploy_config.py')
+            )
+
+    if ip_error:
+        print()
+        print('* NOTE *')
+        print(ip_error)
+        print('* NOTE *')
+        print()
         print('# TODO: check local_net_id above; it should match Windows',
               file=f)
