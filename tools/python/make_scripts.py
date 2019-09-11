@@ -25,10 +25,10 @@ script = f'''
 @pause
 
 "C:/Program Files/Docker/Docker/resources/bin/docker.exe" run ^
-        -v {DeployRoot}:/ads-deploy ^
-        -v {SolutionDir}:{IocMountPath} ^
+        -v "{DeployRoot}:/ads-deploy" ^
+        -v "{SolutionDir}:{IocMountPath}" ^
         -i {DockerImage} ^
-        "make -C ${{ADS_IOC_PATH}}/iocBoot/templates && cd {ioc_path} && make && sed -i '/^adsIoc_registerRecord.*$/a adsSetLocalAddress({local_net_id})' st.cmd && ./st.cmd"
+        "make -C ${{ADS_IOC_PATH}}/iocBoot/templates && cd '{ioc_path}' && make && sed -i '/^adsIoc_registerRecord.*$/a adsSetLocalAddress({local_net_id})' st.cmd && ./st.cmd"
 '''
 
 with open(ioc_path / 'windows_run-ioc-in-docker.cmd', 'wt') as f:
@@ -41,11 +41,11 @@ script = f'''
 @echo Starting Typhon...
 
 "C:/Program Files/Docker/Docker/resources/bin/docker.exe" run ^
-        -v {DeployRoot}:/ads-deploy/tools ^
-        -v {SolutionDir}:{IocMountPath} ^
+        -v "{DeployRoot}:/ads-deploy/tools" ^
+        -v "{SolutionDir}:{IocMountPath}" ^
 	-e DISPLAY=host.docker.internal:0.0 ^
 	-i {DockerImage} ^
-	"cd {IocMountPath} && eval $(python /ads-deploy/tools/python/environment.py) && pytmc stcmd --template-path /ads-deploy/tools/templates --template typhon_display.py --only-motor """{project}""" > /tmp/display.py && python /tmp/display.py"
+	"cd '{IocMountPath}' && eval $(python /ads-deploy/tools/python/environment.py) && pytmc stcmd --template-path /ads-deploy/tools/templates --template typhon_display.py --only-motor """{project}""" > /tmp/display.py && python /tmp/display.py"
 '''
 
 with open(ioc_path / 'windows_run-typhon-gui.cmd', 'wt') as f:

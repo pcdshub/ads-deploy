@@ -10,7 +10,7 @@
 
 @echo Opening the deploy configuration script in notepad.
 @echo Close notepad when you have updated the settings to continue...
-@cd %IOCPath%
+@cd "%IOCPath%"
 @notepad deploy_config.py
 
 @echo.

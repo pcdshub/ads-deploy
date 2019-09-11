@@ -33,8 +33,8 @@
 )
 
 @SET RunDocker=docker run ^
-    -v %DeployRoot%:/ads-deploy/tools ^
-    -v %SolutionDir%:%IocMountPath% ^
+    -v "%DeployRoot%:/ads-deploy/tools" ^
+    -v "%SolutionDir%:%IocMountPath%" ^
     -i
 
 @SET AdsDeployConfigured=1
