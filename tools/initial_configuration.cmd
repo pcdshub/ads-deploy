@@ -23,11 +23,6 @@
 @echo - Attempting to build the IOC
 @CALL %~dp0\build_ioc.cmd %1 %2 %3 %4 %5 %6 %7
 
-@echo.
-@echo ---------------------------------------------------
-@echo - Creating IOC boot scripts
-@CALL %~dp0\make_scripts.cmd %1 %2 %3 %4 %5 %6 %7
-
 @GOTO :eof
 
 :Fail
