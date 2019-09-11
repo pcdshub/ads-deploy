@@ -1,9 +1,10 @@
 import glob
 import re
 
+import ophyd
 import typhon
 
-from ophyd import Device, EpicsMotor, EpicsSignal, Component as Cpt
+from ophyd import EpicsMotor, EpicsSignal, EpicsSignalRO, Component as Cpt
 from qtpy.QtWidgets import QApplication
 
 
@@ -20,23 +21,70 @@ def components_from_db(fn):
             m = RECORD_RE.match(line)
             if m:
                 rtyp, name = m.groups()
-
                 name = name.strip(' "')
                 attr = name.split(':')[-1] if ':' in name else name
                 attr = attr.replace(' ', '_')
-                components[attr] = Cpt(EpicsSignal, name, kind='normal')
-                print(f'Adding component {attr} ({name})')
+                cls = EpicsSignalRO if name.endswith('_RBV') else EpicsSignal
+                components[attr] = Cpt(cls, name, kind='normal')
+                print(f'Adding component {cls} {attr} ({name})')
     return components
 
 
-class PLCDevice(Device):
-    # Hack in some additional signals (normally, this would not be recommended...)
-    _dev_namespace = locals()
-    for dbfn in glob.glob("*.db"):
-        cpts = components_from_db(dbfn)
-        _dev_namespace.update(cpts)
-# TODO: replace this with make_device_from_components()
+def create_device_from_components(name, *, docstring=None,
+                                  base_class=ophyd.Device, class_kwargs=None,
+                                  **components):
+    '''
+    Factory function to make a Device from Components
 
+    (Borrowed / simplified from ophyd, as we're still on an older version)
+
+    Parameters
+    ----------
+    name : str
+        Class name to create
+    docstring : str, optional
+        Docstring to attach to the class
+    base_class : Device or sub-class, optional
+        Class to inherit from, defaults to Device
+    **components : dict
+        Keyword arguments are used to map component attribute names to
+        Components.
+
+    Returns
+    -------
+    cls : Device
+        Newly generated Device class
+    '''
+    if docstring is None:
+        docstring = f'{name} Device'
+
+    if not isinstance(base_class, tuple):
+        base_class = (base_class, )
+
+    if class_kwargs is None:
+        class_kwargs = {}
+
+    clsdict = {
+        '__doc__': docstring,
+        **components
+    }
+
+    return type(name, base_class, clsdict, **class_kwargs)
+
+
+def create_plc_device_class():
+    components = {}
+    for dbfn in glob.glob("*.db"):
+        db_cpts = components_from_db(dbfn)
+        components.update(db_cpts)
+        print(f'Found database file {dbfn}')
+        print(f'    - creating {len(db_cpts)} components on PLCDevice')
+
+    # TODO: use ophyd.create_device_from_components after upgrade
+    return create_device_from_components(
+        'PLCDevice', base_class=ophyd.Device, **components)
+
+PLCDevice = create_plc_device_class()
 device = PLCDevice('', name='{{name}}')
 
 app = QApplication([])

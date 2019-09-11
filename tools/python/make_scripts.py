@@ -45,7 +45,7 @@ script = f'''
         -v "{SolutionDir}:{IocMountPath}" ^
 	-e DISPLAY=host.docker.internal:0.0 ^
 	-i {DockerImage} ^
-	"cd '{IocMountPath}' && eval $(python /ads-deploy/tools/python/environment.py) && pytmc stcmd --template-path /ads-deploy/tools/templates --template typhon_display.py --only-motor """{project}""" > /tmp/display.py && python /tmp/display.py"
+	"cd '{ioc_path}' && pytmc stcmd --template-path /ads-deploy/tools/templates --template typhon_display.py --only-motor """{IocMountPath}/{project}""" > /tmp/display.py && echo 'Running Typhon...' && python /tmp/display.py"
 '''
 
 with open(ioc_path / 'windows_run-typhon-gui.cmd', 'wt') as f:
