@@ -54,7 +54,8 @@ Please close TwinCAT now and
 
     script_text=f'''\
 {spawn_docker}
-        "make -C ${{ADS_IOC_PATH}}/iocBoot/templates && cd '{ioc_path}' && make && sed -i '/^adsIoc_registerRecord.*$/a adsSetLocalAddress({local_net_id})' st.cmd && ./st.cmd"
+        "make -C ${{ADS_IOC_PATH}}/iocBoot/templates && cd '{ioc_path}' && make && sed -i '/^adsIoc_registerRecord.*$/a adsSetLocalAddress({local_net_id})' st.cmd && ./st.cmd; echo 'IOC exited.'; sleep 1"
+pause
 ''')
 
 
