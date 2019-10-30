@@ -49,7 +49,7 @@
                     <SaveAllDocs>true</SaveAllDocs>
                     <Title>&amp;3 pytmc: Build IOC(s)</Title>
                     <Unicode>false</Unicode>
-                    <UseOutputWindow>false</UseOutputWindow>
+                    <UseOutputWindow>true</UseOutputWindow>
                     <UseTaskList>false</UseTaskList>
                 </UserCreatedTool>
                 <UserCreatedTool>
