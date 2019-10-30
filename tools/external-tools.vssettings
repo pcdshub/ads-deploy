@@ -84,6 +84,54 @@
                     <UseOutputWindow>true</UseOutputWindow>
                     <UseTaskList>false</UseTaskList>
                 </UserCreatedTool>
+                <UserCreatedTool>
+                    <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
+                    <CloseOnExit>true</CloseOnExit>
+                    <Command>C:\repos\ads-deploy\tools\qt_designer.cmd</Command>
+                    <Index>5</Index>
+                    <InitialDirectory>$(SolutionDir)</InitialDirectory>
+                    <IsGUIapp>false</IsGUIapp>
+                    <NameID>0</NameID>
+                    <Package>{00000000-0000-0000-0000-000000000000}</Package>
+                    <PromptForArguments>false</PromptForArguments>
+                    <SaveAllDocs>true</SaveAllDocs>
+                    <Title>gui: Qt Designer</Title>
+                    <Unicode>false</Unicode>
+                    <UseOutputWindow>false</UseOutputWindow>
+                    <UseTaskList>false</UseTaskList>
+                </UserCreatedTool>
+                <UserCreatedTool>
+                    <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
+                    <CloseOnExit>true</CloseOnExit>
+                    <Command>C:\Repos\ads-deploy\tools\debug_records.cmd</Command>
+                    <Index>6</Index>
+                    <InitialDirectory>$(SolutionDir)</InitialDirectory>
+                    <IsGUIapp>false</IsGUIapp>
+                    <NameID>0</NameID>
+                    <Package>{00000000-0000-0000-0000-000000000000}</Package>
+                    <PromptForArguments>false</PromptForArguments>
+                    <SaveAllDocs>true</SaveAllDocs>
+                    <Title>pytmc: debug records</Title>
+                    <Unicode>false</Unicode>
+                    <UseOutputWindow>false</UseOutputWindow>
+                    <UseTaskList>false</UseTaskList>
+                </UserCreatedTool>
+                <UserCreatedTool>
+                    <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
+                    <CloseOnExit>true</CloseOnExit>
+                    <Command>C:\Repos\ads-deploy\tools\summary.cmd</Command>
+                    <Index>7</Index>
+                    <InitialDirectory>$(SolutionDir)</InitialDirectory>
+                    <IsGUIapp>false</IsGUIapp>
+                    <NameID>0</NameID>
+                    <Package>{00000000-0000-0000-0000-000000000000}</Package>
+                    <PromptForArguments>false</PromptForArguments>
+                    <SaveAllDocs>true</SaveAllDocs>
+                    <Title>pytmc: project summary</Title>
+                    <Unicode>false</Unicode>
+                    <UseOutputWindow>true</UseOutputWindow>
+                    <UseTaskList>false</UseTaskList>
+                </UserCreatedTool>
             </ExternalTools>
         </Category>
     </Category>
