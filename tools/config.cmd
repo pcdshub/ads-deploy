@@ -35,6 +35,7 @@
 @SET RunDocker=docker run ^
     -v "%DeployRoot%:/ads-deploy/tools" ^
     -v "%SolutionDir%:%IocMountPath%" ^
+	-e DISPLAY=host.docker.internal:0.0 ^
     -i
 
 @SET AdsDeployConfigured=1
