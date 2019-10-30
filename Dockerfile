@@ -35,8 +35,7 @@ RUN pip install git+https://github.com/slaclab/pytmc.git@${PYTMC_VERSION} \
 RUN conda install typhon -c conda-forge -c pcds-tag
 RUN conda install epics-base -c conda-forge
 
-# TODO this (especially) needs cleaning
-ENV ADS_IOC_ROOT /reg/g/pcds/epics/${BASE_MODULE_VERSION}/ioc/ads-ioc
+ENV ADS_IOC_ROOT /reg/g/pcds/epics/ioc/common/ads-ioc
 ENV ADS_IOC_PATH ${ADS_IOC_ROOT}/${ADS_IOC_VERSION}
 WORKDIR ${ADS_IOC_ROOT}
 
