@@ -91,7 +91,7 @@ app = QApplication([])
 # typhon.use_stylesheet()
 suite = typhon.TyphonSuite()
 
-{% for motor in symbols.Symbol_FB_MotionStage | sort(attribute='nc_axis.axis_number') %}
+{% for motor in symbols.DUT_MotionStage | sort(attribute='name') %}
 axis_{{motor.nc_axis.axis_number}} = EpicsMotor("{{motor|epics_prefix}}{{motor|epics_suffix}}", name='{{motor.name}}')
 suite.add_device(axis_{{motor.nc_axis.axis_number}}, category='Motors')
 {% endfor %}
