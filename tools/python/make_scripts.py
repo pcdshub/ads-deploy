@@ -68,5 +68,5 @@ Starting Typhon...
 
     script_text=f'''\
 {spawn_docker}
-	"cd '{ioc_path}' && pytmc stcmd --template-path /ads-deploy/tools/templates --template typhon_display.py --only-motor """{IocMountPath}/{project}""" > /tmp/display.py && echo 'Running Typhon...' && python /tmp/display.py"
+	"cd '{ioc_path}' && pytmc stcmd --template-path /ads-deploy/tools/templates --template typhon_display.py --only-motor """{IocMountPath}/{project}""" > /tmp/display.py && echo 'Running Typhon...' && python /tmp/display.py; sleep 1"
 ''')
