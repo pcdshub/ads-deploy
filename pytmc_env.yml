@@ -28,7 +28,6 @@ ipython_genutils=0.2.0=py_1
 jedi=0.15.1=py37_0
 jinja2=2.10.3=py_0
 jpeg=9c=h14c3975_1001
-libarchive=3.4.0=hb0c0d93_1
 libclang=9.0.0=hc9558a2_1
 libedit=3.1.20170329=hf8c457e_1001
 libffi=3.2.1=he1b5a44_1006
@@ -66,7 +65,6 @@ pyopenssl=19.0.0=py37_0
 pyqt=5.12.3=py37hcca6a23_0
 pysocks=1.7.1=py37_0
 python=3.7.3=h33d41f4_1
-python-libarchive-c=2.9=py37_0
 qt=5.12.5=h0c104cb_0
 qtpy=1.9.0=py_0
 readline=8.0=hf8c457e_0

@@ -17,7 +17,7 @@ RUN yum -y update \
     && yum clean all
 
 # --- Version settings
-ENV PYTMC_VERSION      v2.3.0
+ENV PYTMC_VERSION      v2.3.1
 ENV ADS_IOC_VERSION    v0.1.5
 # --- Version settings
 
