@@ -1,3 +1,4 @@
+@echo off
 @SET DockerImage=pcdshub/ads-deploy:latest
 
 @SET DeployRoot=%~dp0
@@ -7,11 +8,15 @@
 @SET SolutionDir=%SolutionDir:~1,-1%
 @SET SolutionFilename=%SolutionFilename:~1,-1%
 @SET SolutionName=%SolutionFilename:~0,-4%
+
+@IF [%SolutionDir:~-2%]==[\\] (
+    @SET SolutionDir=%SolutionDir:~0,-1%
+)
+
 @SET SolutionFullPath="%SolutionDir%%SolutionName%"
 @SET IocMountPath=/reg/g/pcds/epics/ioc/%SolutionName%
 
 @if not [%AdsDeployConfigured%] == [1] (
-	@echo off
 	@echo ----------------------------------------------------------------------
 	@echo Solution directory:      %SolutionDir%
 	@echo Solution name:           %SolutionName%
