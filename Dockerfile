@@ -1,4 +1,4 @@
-FROM pcdshub/ads-ioc:v0.1.6
+FROM pcdshub/ads-ioc:R0.2.0
 
 LABEL maintainer="K Lauer <klauer@slac.stanford.edu>"
 USER root
@@ -22,19 +22,18 @@ RUN pip install --upgrade pip
 RUN conda config --add channels conda-forge
 RUN conda install --channel conda-forge --file pytmc_env.yml
 
-ENV PYTMC_VERSION      v2.5.0
+ENV PYTMC_VERSION      v2.6.0
 
 RUN pip install git+https://github.com/slaclab/pytmc.git@${PYTMC_VERSION} \
         git+https://github.com/epicsdeb/pypdb.git@4ad4016 \
         git+https://github.com/slaclab/pydm@v1.8.0 \
         git+https://github.com/stlehmann/pyads@3.1.2
 
-RUN conda install typhon -c conda-forge -c pcds-tag
-RUN conda install epics-base -c conda-forge
+RUN conda install typhon epics-base -c conda-forge -c pcds-tag
 
-ENV ADS_IOC_ROOT /reg/g/pcds/epics/ioc/common/ads-ioc
-ENV ADS_IOC_VERSION    R0.1.6
-ENV ADS_IOC_PATH ${ADS_IOC_ROOT}/${ADS_IOC_VERSION}
+ENV ADS_IOC_ROOT       /reg/g/pcds/epics/ioc/common/ads-ioc
+ENV ADS_IOC_VERSION    R0.2.0
+ENV ADS_IOC_PATH       ${ADS_IOC_ROOT}/${ADS_IOC_VERSION}
 
 RUN make -C ${ADS_IOC_PATH}
 
