@@ -1,14 +1,25 @@
 import distutils.version
+import logging
 import os
 import pathlib
 
 import pytmc
 
-ADS_IOC_LOCATION = pathlib.Path(os.environ.get('ADS_IOC_LOCATION',
-                                '/reg/g/pcds/epics/ioc/common/ads-ioc'))
+logger = logging.getLogger(__name__)
+
+ADS_IOC_LOCATION = pathlib.Path(
+    os.environ.get('ADS_IOC_LOCATION', '/reg/g/pcds/epics/ioc/common/ads-ioc')
+)
 
 
 def get_latest_ads_ioc():
+    """
+    Get the latest ADS IOC path based on environment settings.
+
+    Returns
+    -------
+    pathlib.Path
+    """
     if not ADS_IOC_LOCATION.exists():
         raise RuntimeError(
             f'ADS_IOC_LOCATION={ADS_IOC_LOCATION} does not exist.  Cannot '
@@ -20,7 +31,8 @@ def get_latest_ads_ioc():
 
     def get_version(path):
         try:
-            return distutils.version.LooseVersion(path)
+            version = path.name.lstrip('Rv').replace('-', '.')
+            return tuple(distutils.version.LooseVersion(version).version)
         except Exception:
             ...
 
@@ -31,12 +43,21 @@ def get_latest_ads_ioc():
 
     if not paths:
         raise RuntimeError(
-            f'ADS_IOC_LOCATION={ADS_IOC_LOCATION} does not exist.  Cannot '
-            'automatically find latest version of ads-ioc.'
+            f'No versions in ADS_IOC_LOCATION={ADS_IOC_LOCATION} were found. '
+            'Cannot automatically find latest version of ads-ioc.'
         )
 
-    latest_version = max(paths)
-    return paths[latest_version]
+    latest_version = paths[max(paths)]
+    if (latest_version / 'iocBoot' / 'templates').exists():
+        logger.info('Found latest ads-ioc: %s', latest_version)
+        return latest_version
+
+    raise RuntimeError(
+        f'The latest version in ADS_IOC_LOCATION={ADS_IOC_LOCATION} was '
+        f'determined to be {max(paths)} ({latest_version}), but there is no '
+        'corresponding Makefile.  Cannot automatically find latest version of '
+        'ads-ioc.'
+    )
 
 
 def get_tsprojects_from_filename(filename):
