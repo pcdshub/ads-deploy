@@ -6,7 +6,7 @@
     call set IPAddresses=%%IPAddresses%%%%f
 )
 
-%RunDocker% %DockerImage% "python /ads-deploy/tools/python/find_tsproj.py '/reg/g/pcds/epics/ioc/%SolutionName%/%SolutionFilename%' %IPAddresses%"
+%RunDocker% %DockerImage% "python -m ads-deploy config '/reg/g/pcds/epics/ioc/%SolutionName%/%SolutionFilename%' --net-id --ip %IPAddresses%"
 
 @echo Opening the deploy configuration script in notepad.
 @echo Close notepad when you have updated the settings to continue...
