@@ -5,9 +5,8 @@ for a given TwinCAT solution (or tsproj project).
 
 import argparse
 import logging
-import pathlib
 
-import pytmc
+from . import util
 
 DESCRIPTION = __doc__
 logger = logging.getLogger(__name__)
@@ -43,16 +42,6 @@ def build_arg_parser(parser=None):
     )
 
     return parser
-
-
-def get_projects_from_filename(filename):
-    filename = pathlib.Path(filename)
-    if filename.suffix == '.tsproj':
-        return filename.parent, [filename]
-    if filename.suffix == '.sln':
-        return filename.parent, pytmc.parser.projects_from_solution(filename)
-
-    raise RuntimeError(f'Expected a .tsproj/.sln file; got {filename.suffix}')
 
 
 def write_deploy_config(solution_path, projects, write_net_id, ip_addresses):
@@ -93,6 +82,6 @@ def write_deploy_config(solution_path, projects, write_net_id, ip_addresses):
 
 
 def main(project, *, net_id=False, ip=None):
-    solution_path, projects = get_projects_from_filename(project.name)
+    solution_path, projects = util.get_tsprojects_from_filename(project.name)
     write_deploy_config(solution_path, projects, net_id, ip)
     print(f'Wrote deploy configuration to "{solution_path}".')

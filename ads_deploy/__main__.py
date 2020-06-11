@@ -14,7 +14,7 @@ import ads_deploy
 DESCRIPTION = __doc__
 
 
-MODULES = ('config', )
+MODULES = ('config', 'iocboot')
 
 
 def _try_import(module):
