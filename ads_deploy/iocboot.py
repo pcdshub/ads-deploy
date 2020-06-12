@@ -209,12 +209,6 @@ def get_template_paths(ioc_template_path, makefile_name='Makefile.ioc'):
     return ioc_template_path, makefile_path
 
 
-def split_macros(macros):
-    """Split user-provided macro strings into a dictionary."""
-    split = [macro.split('=', 1) for macro in macros]
-    return {var: value for var, value in split}
-
-
 def main(project, ioc_template_path, *, destination=None, prefix='ioc-',
          overwrite=False, makefile_name='Makefile.ioc', dry_run=False,
          plcs=None, macro=None):
@@ -230,7 +224,7 @@ def main(project, ioc_template_path, *, destination=None, prefix='ioc-',
         makefile_path=makefile_path,
         overwrite=overwrite,
         dry_run=dry_run,
-        macros=split_macros(macro or []),
+        macros=util.split_macros(macro or []),
     )
 
     destination = pathlib.Path(destination)

@@ -2,6 +2,8 @@ import distutils.version
 import logging
 import os
 import pathlib
+import re
+import string
 
 import pytmc
 
@@ -80,3 +82,23 @@ def get_tsprojects_from_filename(filename):
         return filename.parent, pytmc.parser.projects_from_solution(filename)
 
     raise RuntimeError(f'Expected a .tsproj/.sln file; got {filename.suffix}')
+
+
+def split_macros(macros):
+    """Split user-provided macro strings into a dictionary."""
+    split = [macro.split('=', 1) for macro in macros]
+    return {var: value for var, value in split}
+
+
+def expand_macros(s, macros):
+    if '$' not in s:
+        return s
+
+    if '$(' in s:
+        # Replace $(...) with ${...} for string.Template
+        s = re.sub(r'\$\(([^)]+)\)', r'${\1}', s)
+
+    try:
+        return string.Template(s).substitute(macros)
+    except KeyError:
+        raise ValueError(f'Unexpanded macro in string: {s}') from None

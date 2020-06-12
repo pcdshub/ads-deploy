@@ -14,7 +14,11 @@ import ads_deploy
 DESCRIPTION = __doc__
 
 
-MODULES = ('config', 'iocboot')
+MODULES = {
+    'config': 'config',
+    'iocboot': 'iocboot',
+    'typhos_gui': 'typhos',
+}
 
 
 def _try_import(module):
@@ -27,21 +31,21 @@ def _build_commands():
     result = {}
     unavailable = []
 
-    for module in sorted(MODULES):
+    for module, command in sorted(MODULES.items()):
         try:
             mod = _try_import(module)
         except ImportError as ex:
             unavailable.append((module, ex))
         else:
-            result[module] = (mod.build_arg_parser, mod.main)
-            DESCRIPTION += f'\n    $ ads-deploy {module} --help'
+            result[command] = (mod.build_arg_parser, mod.main)
+            DESCRIPTION += f'\n    $ ads-deploy {command} --help'
 
     if unavailable:
         DESCRIPTION += '\n\n'
 
         for module, ex in unavailable:
             DESCRIPTION += (
-                f'WARNING: ads_deploy {module!r} is unavailable due to:'
+                f'WARNING: ads_deploy {command!r} is unavailable due to:'
                 f'\n\t{ex.__class__.__name__}: {ex}'
             )
 
