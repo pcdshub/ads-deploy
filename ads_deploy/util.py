@@ -102,3 +102,17 @@ def expand_macros(s, macros):
         return string.Template(s).substitute(macros)
     except KeyError:
         raise ValueError(f'Unexpanded macro in string: {s}') from None
+
+
+def should_filter(includes, excludes, values):
+    excluded = any(excl in value
+                   for excl in excludes
+                   for value in values
+                   )
+    if excluded:
+        return False
+
+    return not len(includes) or any(incl in value
+                                    for incl in includes
+                                    for value in values
+                                    )

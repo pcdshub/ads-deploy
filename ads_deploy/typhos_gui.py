@@ -81,41 +81,30 @@ def records_from_packages(packages, macros):
         yield input_record, output_record
 
 
+def record_to_attribute(record):
+    name = record.pvname.strip(' "')
+    attr = name.replace(':', '_')
+    if not attr.isidentifier():
+        logger.warning('Bad attr name; skipping: %s %s', name, attr)
+        return
+    return attr
+
+
 def components_from_records(records):
-    components = {}
     for input_record, output_record in records:
-        name = input_record.pvname.strip(' "')
-        attr = name.replace(':', '_')
-        if not attr.isidentifier():
-            logger.warning('Bad attr name; skipping: %s %s', name, attr)
+        attr = record_to_attribute(input_record)
+        if not attr:
+            continue
+
         if output_record:
-            components[attr] = ophyd.Component(
+            component = ophyd.Component(
                 ophyd.EpicsSignal, input_record.pvname,
                 write_pv=output_record.pvname, kind='normal')
         else:
-            components[attr] = ophyd.Component(
+            component = ophyd.Component(
                 ophyd.EpicsSignalRO, input_record.pvname, kind='normal')
 
-    return components
-
-
-def filter_items(key_to_values, includes, excludes):
-    includes = includes or []
-    excludes = excludes or []
-
-    def should_include(*values):
-        excluded = any(excl in value
-                       for excl in excludes
-                       for value in values
-                       )
-        included = not len(includes) or any(incl in value
-                                            for incl in includes
-                                            for value in values
-                                            )
-        return included and not excluded
-
-    return {key for key, values in key_to_values.items()
-            if should_include(key, *values)}
+        yield attr, component
 
 
 def ophyd_device_from_plc(plc_name, plc_project, macros, *, includes=None,
@@ -126,12 +115,10 @@ def ophyd_device_from_plc(plc_name, plc_project, macros, *, includes=None,
                                    show_error_context=True)
 
     records = records_from_packages(packages, macros)
-    components = components_from_records(records)
-    filtered_keys = filter_items({attr: [cpt.suffix]
-                                  for attr, cpt in components.items()},
-                                 includes, excludes)
-    components = {attr: cpt for attr, cpt in components.items()
-                  if attr in filtered_keys}
+    components = {
+        attr: cpt for attr, cpt in components_from_records(records)
+        if util.should_filter(includes, excludes, [attr, cpt.suffix])
+    }
     device_cls = ophyd.device.create_device_from_components(
         plc_name.capitalize(), **components)
 
@@ -140,6 +127,8 @@ def ophyd_device_from_plc(plc_name, plc_project, macros, *, includes=None,
 
 def main(project, *, plcs=None, include=None, exclude=None, macro=None):
     macros = util.split_macros(macro or [])
+    include = include or []
+    exclude = exclude or []
 
     solution_path, projects = util.get_tsprojects_from_filename(project.name)
 
