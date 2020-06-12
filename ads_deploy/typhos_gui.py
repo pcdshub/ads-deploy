@@ -99,21 +99,23 @@ def components_from_records(records):
     return components
 
 
-def filter_components(components, includes, excludes):
+def filter_items(key_to_values, includes, excludes):
     includes = includes or []
     excludes = excludes or []
 
-    def should_include(attr, cpt):
-        excluded = any(excl in attr or excl in cpt.suffix
-                       for excl in excludes)
-        included = any(incl in attr or incl in cpt.suffix
-                       for incl in includes) or not len(includes)
+    def should_include(*values):
+        excluded = any(excl in value
+                       for excl in excludes
+                       for value in values
+                       )
+        included = not len(includes) or any(incl in value
+                                            for incl in includes
+                                            for value in values
+                                            )
         return included and not excluded
 
-    return {attr: component
-            for attr, component in components.items()
-            if should_include(attr, component)
-            }
+    return {key for key, values in key_to_values.items()
+            if should_include(key, *values)}
 
 
 def ophyd_device_from_plc(plc_name, plc_project, macros, *, includes=None,
@@ -125,7 +127,11 @@ def ophyd_device_from_plc(plc_name, plc_project, macros, *, includes=None,
 
     records = records_from_packages(packages, macros)
     components = components_from_records(records)
-    components = filter_components(components, includes, excludes)
+    filtered_keys = filter_items({attr: [cpt.suffix]
+                                  for attr, cpt in components.items()},
+                                 includes, excludes)
+    components = {attr: cpt for attr, cpt in components.items()
+                  if attr in filtered_keys}
     device_cls = ophyd.device.create_device_from_components(
         plc_name.capitalize(), **components)
 
