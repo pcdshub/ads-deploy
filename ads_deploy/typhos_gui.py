@@ -1,5 +1,5 @@
 """
-`ads-deploy iocboot` is used to create iocBoot directories for the specified
+`ads-deploy typhos` is used to create a quick typhos screen, directly from a
 TwinCAT solution (or tsproj project).
 """
 
@@ -35,14 +35,14 @@ def build_arg_parser(parser=None):
     parser.add_argument(
         '--exclude',
         type=str,
-        nargs='?',
+        nargs='*',
         help='Exclude signals by name',
     )
 
     parser.add_argument(
         '--include',
         type=str,
-        nargs='?',
+        nargs='*',
         help='Include signals by name',
     )
 
@@ -99,7 +99,25 @@ def components_from_records(records):
     return components
 
 
-def ophyd_device_from_plc(plc_name, plc_project, macros):
+def filter_components(components, includes, excludes):
+    includes = includes or []
+    excludes = excludes or []
+
+    def should_include(attr, cpt):
+        excluded = any(excl in attr or excl in cpt.suffix
+                       for excl in excludes)
+        included = any(incl in attr or incl in cpt.suffix
+                       for incl in includes) or not len(includes)
+        return included and not excluded
+
+    return {attr: component
+            for attr, component in components.items()
+            if should_include(attr, component)
+            }
+
+
+def ophyd_device_from_plc(plc_name, plc_project, macros, *, includes=None,
+                          excludes=None):
     tmc = pytmc.parser.parse(plc_project.tmc_path)
 
     packages, exceptions = process(tmc, allow_errors=True,
@@ -107,6 +125,7 @@ def ophyd_device_from_plc(plc_name, plc_project, macros):
 
     records = records_from_packages(packages, macros)
     components = components_from_records(records)
+    components = filter_components(components, includes, excludes)
     device_cls = ophyd.device.create_device_from_components(
         plc_name.capitalize(), **components)
 
@@ -114,8 +133,6 @@ def ophyd_device_from_plc(plc_name, plc_project, macros):
 
 
 def main(project, *, plcs=None, include=None, exclude=None, macro=None):
-    include = include or []
-    exclude = exclude or []
     macros = util.split_macros(macro or [])
 
     solution_path, projects = util.get_tsprojects_from_filename(project.name)
@@ -131,7 +148,9 @@ def main(project, *, plcs=None, include=None, exclude=None, macro=None):
                 continue
 
             try:
-                device = ophyd_device_from_plc(plc_name, plc_project, macros)
+                device = ophyd_device_from_plc(plc_name, plc_project, macros,
+                                               includes=include,
+                                               excludes=exclude)
             except Exception:
                 logger.exception('Failed to create device for plc %s',
                                  plc_name)
