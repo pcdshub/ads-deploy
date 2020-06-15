@@ -1,139 +1,140 @@
+<?xml version="1.0"?>
 <UserSettings>
-    <ApplicationIdentity version="12.0" />
-    <ToolsOptions />
-    <Category name="Environment_Group" RegisteredName="Environment_Group">
-        <Category name="Environment_ExternalTools" Category="{E8FAE9E8-FBA2-4474-B134-AB0FFCFB291D}" Package="{DA9FB551-C724-11d0-AE1F-00A0C90FFFC3}" RegisteredName="Environment_ExternalTools" PackageName="Visual Studio Environment Package">
-            <ExternalTools>
-                <UserCreatedTool>
-                    <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
-                    <CloseOnExit>true</CloseOnExit>
-                    <Command>C:\repos\ads-deploy\tools\initial_configuration.cmd</Command>
-                    <Index>0</Index>
-                    <InitialDirectory>$(SolutionDir)</InitialDirectory>
-                    <IsGUIapp>false</IsGUIapp>
-                    <NameID>0</NameID>
-                    <Package>{00000000-0000-0000-0000-000000000000}</Package>
-                    <PromptForArguments>false</PromptForArguments>
-                    <SaveAllDocs>true</SaveAllDocs>
-                    <Title>&amp;1 pytmc: Configuration</Title>
-                    <Unicode>false</Unicode>
-                    <UseOutputWindow>true</UseOutputWindow>
-                    <UseTaskList>false</UseTaskList>
-                </UserCreatedTool>
-                <UserCreatedTool>
-                    <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
-                    <CloseOnExit>true</CloseOnExit>
-                    <Command>C:\Repos\ads-deploy\tools\lint_pragmas.cmd</Command>
-                    <Index>1</Index>
-                    <InitialDirectory>$(SolutionDir)</InitialDirectory>
-                    <IsGUIapp>false</IsGUIapp>
-                    <NameID>0</NameID>
-                    <Package>{00000000-0000-0000-0000-000000000000}</Package>
-                    <PromptForArguments>false</PromptForArguments>
-                    <SaveAllDocs>true</SaveAllDocs>
-                    <Title>&amp;2 pytmc: Lint pragmas</Title>
-                    <Unicode>false</Unicode>
-                    <UseOutputWindow>true</UseOutputWindow>
-                    <UseTaskList>false</UseTaskList>
-                </UserCreatedTool>
-                <UserCreatedTool>
-                    <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
-                    <CloseOnExit>true</CloseOnExit>
-                    <Command>c:\repos\ads-deploy\tools\build_ioc.cmd</Command>
-                    <Index>2</Index>
-                    <InitialDirectory>$(SolutionDir)</InitialDirectory>
-                    <IsGUIapp>false</IsGUIapp>
-                    <NameID>0</NameID>
-                    <Package>{00000000-0000-0000-0000-000000000000}</Package>
-                    <PromptForArguments>false</PromptForArguments>
-                    <SaveAllDocs>true</SaveAllDocs>
-                    <Title>&amp;3 pytmc: Build IOC(s)</Title>
-                    <Unicode>false</Unicode>
-                    <UseOutputWindow>true</UseOutputWindow>
-                    <UseTaskList>false</UseTaskList>
-                </UserCreatedTool>
-                <UserCreatedTool>
-                    <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
-                    <CloseOnExit>true</CloseOnExit>
-                    <Command>c:\repos\ads-deploy\tools\run_ioc.cmd</Command>
-                    <Index>3</Index>
-                    <InitialDirectory>$(SolutionDir)</InitialDirectory>
-                    <IsGUIapp>false</IsGUIapp>
-                    <NameID>0</NameID>
-                    <Package>{00000000-0000-0000-0000-000000000000}</Package>
-                    <PromptForArguments>false</PromptForArguments>
-                    <SaveAllDocs>true</SaveAllDocs>
-                    <Title>&amp;4 pytmc: Build and Run IOC(s)</Title>
-                    <Unicode>false</Unicode>
-                    <UseOutputWindow>true</UseOutputWindow>
-                    <UseTaskList>false</UseTaskList>
-                </UserCreatedTool>
-                <UserCreatedTool>
-                    <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
-                    <CloseOnExit>true</CloseOnExit>
-                    <Command>C:\repos\ads-deploy\tools\motor_screens.cmd</Command>
-                    <Index>4</Index>
-                    <InitialDirectory>$(SolutionDir)</InitialDirectory>
-                    <IsGUIapp>false</IsGUIapp>
-                    <NameID>0</NameID>
-                    <Package>{00000000-0000-0000-0000-000000000000}</Package>
-                    <PromptForArguments>false</PromptForArguments>
-                    <SaveAllDocs>true</SaveAllDocs>
-                    <Title>&amp;5 typhon: Motor Screens</Title>
-                    <Unicode>false</Unicode>
-                    <UseOutputWindow>true</UseOutputWindow>
-                    <UseTaskList>false</UseTaskList>
-                </UserCreatedTool>
-                <UserCreatedTool>
-                    <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
-                    <CloseOnExit>true</CloseOnExit>
-                    <Command>C:\repos\ads-deploy\tools\qt_designer.cmd</Command>
-                    <Index>5</Index>
-                    <InitialDirectory>$(SolutionDir)</InitialDirectory>
-                    <IsGUIapp>false</IsGUIapp>
-                    <NameID>0</NameID>
-                    <Package>{00000000-0000-0000-0000-000000000000}</Package>
-                    <PromptForArguments>false</PromptForArguments>
-                    <SaveAllDocs>true</SaveAllDocs>
-                    <Title>gui: Qt Designer</Title>
-                    <Unicode>false</Unicode>
-                    <UseOutputWindow>false</UseOutputWindow>
-                    <UseTaskList>false</UseTaskList>
-                </UserCreatedTool>
-                <UserCreatedTool>
-                    <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
-                    <CloseOnExit>true</CloseOnExit>
-                    <Command>C:\Repos\ads-deploy\tools\debug_records.cmd</Command>
-                    <Index>6</Index>
-                    <InitialDirectory>$(SolutionDir)</InitialDirectory>
-                    <IsGUIapp>false</IsGUIapp>
-                    <NameID>0</NameID>
-                    <Package>{00000000-0000-0000-0000-000000000000}</Package>
-                    <PromptForArguments>false</PromptForArguments>
-                    <SaveAllDocs>true</SaveAllDocs>
-                    <Title>pytmc: debug records</Title>
-                    <Unicode>false</Unicode>
-                    <UseOutputWindow>false</UseOutputWindow>
-                    <UseTaskList>false</UseTaskList>
-                </UserCreatedTool>
-                <UserCreatedTool>
-                    <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
-                    <CloseOnExit>true</CloseOnExit>
-                    <Command>C:\Repos\ads-deploy\tools\summary.cmd</Command>
-                    <Index>7</Index>
-                    <InitialDirectory>$(SolutionDir)</InitialDirectory>
-                    <IsGUIapp>false</IsGUIapp>
-                    <NameID>0</NameID>
-                    <Package>{00000000-0000-0000-0000-000000000000}</Package>
-                    <PromptForArguments>false</PromptForArguments>
-                    <SaveAllDocs>true</SaveAllDocs>
-                    <Title>pytmc: project summary</Title>
-                    <Unicode>false</Unicode>
-                    <UseOutputWindow>true</UseOutputWindow>
-                    <UseTaskList>false</UseTaskList>
-                </UserCreatedTool>
-            </ExternalTools>
-        </Category>
+  <ApplicationIdentity version="12.0"/>
+  <ToolsOptions/>
+  <Category name="Environment_Group" RegisteredName="Environment_Group">
+    <Category name="Environment_ExternalTools" Category="{E8FAE9E8-FBA2-4474-B134-AB0FFCFB291D}" Package="{DA9FB551-C724-11d0-AE1F-00A0C90FFFC3}" RegisteredName="Environment_ExternalTools" PackageName="Visual Studio Environment Package">
+      <ExternalTools>
+        <UserCreatedTool>
+          <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
+          <CloseOnExit>true</CloseOnExit>
+          <Command>C:\Repos\ads-deploy\tools\lint_pragmas.cmd</Command>
+          <Index>0</Index>
+          <InitialDirectory>$(SolutionDir)</InitialDirectory>
+          <IsGUIapp>false</IsGUIapp>
+          <NameID>0</NameID>
+          <Package>{00000000-0000-0000-0000-000000000000}</Package>
+          <PromptForArguments>false</PromptForArguments>
+          <SaveAllDocs>true</SaveAllDocs>
+          <Title>&amp;1 Lint pragmas</Title>
+          <Unicode>false</Unicode>
+          <UseOutputWindow>true</UseOutputWindow>
+          <UseTaskList>false</UseTaskList>
+        </UserCreatedTool>
+        <UserCreatedTool>
+          <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
+          <CloseOnExit>true</CloseOnExit>
+          <Command>c:\repos\ads-deploy\tools\build_ioc.cmd</Command>
+          <Index>1</Index>
+          <InitialDirectory>$(SolutionDir)</InitialDirectory>
+          <IsGUIapp>false</IsGUIapp>
+          <NameID>0</NameID>
+          <Package>{00000000-0000-0000-0000-000000000000}</Package>
+          <PromptForArguments>false</PromptForArguments>
+          <SaveAllDocs>true</SaveAllDocs>
+          <Title>&amp;2 Configure and build IOC(s)</Title>
+          <Unicode>false</Unicode>
+          <UseOutputWindow>true</UseOutputWindow>
+          <UseTaskList>false</UseTaskList>
+        </UserCreatedTool>
+        <UserCreatedTool>
+          <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
+          <CloseOnExit>true</CloseOnExit>
+          <Command>c:\repos\ads-deploy\tools\run_ioc.cmd</Command>
+          <Index>2</Index>
+          <InitialDirectory>$(SolutionDir)</InitialDirectory>
+          <IsGUIapp>false</IsGUIapp>
+          <NameID>0</NameID>
+          <Package>{00000000-0000-0000-0000-000000000000}</Package>
+          <PromptForArguments>false</PromptForArguments>
+          <SaveAllDocs>true</SaveAllDocs>
+          <Title>&amp;3 Run IOC(s) on Docker</Title>
+          <Unicode>false</Unicode>
+          <UseOutputWindow>true</UseOutputWindow>
+          <UseTaskList>false</UseTaskList>
+        </UserCreatedTool>
+        <UserCreatedTool>
+          <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
+          <CloseOnExit>true</CloseOnExit>
+          <Command>C:\repos\ads-deploy\tools\motor_screens.cmd</Command>
+          <Index>3</Index>
+          <InitialDirectory>$(SolutionDir)</InitialDirectory>
+          <IsGUIapp>false</IsGUIapp>
+          <NameID>0</NameID>
+          <Package>{00000000-0000-0000-0000-000000000000}</Package>
+          <PromptForArguments>false</PromptForArguments>
+          <SaveAllDocs>true</SaveAllDocs>
+          <Title>&amp;4a Motor Screens</Title>
+          <Unicode>false</Unicode>
+          <UseOutputWindow>true</UseOutputWindow>
+          <UseTaskList>false</UseTaskList>
+        </UserCreatedTool>
+        <UserCreatedTool>
+          <Arguments>$(SolutionDir) $(SolutionFileName) --include motor --exclude abc</Arguments>
+          <CloseOnExit>true</CloseOnExit>
+          <Command>C:\Repos\ads-deploy\tools\other_screens.cmd</Command>
+          <Index>4</Index>
+          <InitialDirectory>$(SolutionDir)</InitialDirectory>
+          <IsGUIapp>false</IsGUIapp>
+          <NameID>0</NameID>
+          <Package>{00000000-0000-0000-0000-000000000000}</Package>
+          <PromptForArguments>true</PromptForArguments>
+          <SaveAllDocs>true</SaveAllDocs>
+          <Title>&amp;4b Other screens</Title>
+          <Unicode>false</Unicode>
+          <UseOutputWindow>false</UseOutputWindow>
+          <UseTaskList>false</UseTaskList>
+        </UserCreatedTool>
+        <UserCreatedTool>
+          <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
+          <CloseOnExit>true</CloseOnExit>
+          <Command>C:\Repos\ads-deploy\tools\debug_records.cmd</Command>
+          <Index>5</Index>
+          <InitialDirectory>$(SolutionDir)</InitialDirectory>
+          <IsGUIapp>false</IsGUIapp>
+          <NameID>0</NameID>
+          <Package>{00000000-0000-0000-0000-000000000000}</Package>
+          <PromptForArguments>false</PromptForArguments>
+          <SaveAllDocs>true</SaveAllDocs>
+          <Title>&amp;5 Record debugging</Title>
+          <Unicode>false</Unicode>
+          <UseOutputWindow>false</UseOutputWindow>
+          <UseTaskList>false</UseTaskList>
+        </UserCreatedTool>
+        <UserCreatedTool>
+          <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
+          <CloseOnExit>true</CloseOnExit>
+          <Command>C:\Repos\ads-deploy\tools\summary.cmd</Command>
+          <Index>6</Index>
+          <InitialDirectory>$(SolutionDir)</InitialDirectory>
+          <IsGUIapp>false</IsGUIapp>
+          <NameID>0</NameID>
+          <Package>{00000000-0000-0000-0000-000000000000}</Package>
+          <PromptForArguments>false</PromptForArguments>
+          <SaveAllDocs>true</SaveAllDocs>
+          <Title>&amp;6 Project summary</Title>
+          <Unicode>false</Unicode>
+          <UseOutputWindow>false</UseOutputWindow>
+          <UseTaskList>false</UseTaskList>
+        </UserCreatedTool>
+        <UserCreatedTool>
+          <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
+          <CloseOnExit>true</CloseOnExit>
+          <Command>C:\repos\ads-deploy\tools\qt_designer.cmd</Command>
+          <Index>7</Index>
+          <InitialDirectory>$(SolutionDir)</InitialDirectory>
+          <IsGUIapp>false</IsGUIapp>
+          <NameID>0</NameID>
+          <Package>{00000000-0000-0000-0000-000000000000}</Package>
+          <PromptForArguments>false</PromptForArguments>
+          <SaveAllDocs>true</SaveAllDocs>
+          <Title>Qt Designer</Title>
+          <Unicode>false</Unicode>
+          <UseOutputWindow>false</UseOutputWindow>
+          <UseTaskList>false</UseTaskList>
+        </UserCreatedTool>
+      </ExternalTools>
     </Category>
-    <Category name="TwinCAT" RegisteredName="TwinCAT" />
+  </Category>
+  <Category name="TwinCAT" RegisteredName="TwinCAT"/>
 </UserSettings>
