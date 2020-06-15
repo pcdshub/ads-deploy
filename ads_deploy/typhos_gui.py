@@ -15,6 +15,9 @@ import typhos.cli
 
 from . import util
 
+# import uuid
+
+
 DESCRIPTION = __doc__
 logger = logging.getLogger(__name__)
 
@@ -87,46 +90,131 @@ def records_from_packages(packages, macros):
         yield input_record, output_record
 
 
-def record_to_attribute(record):
-    name = record.pvname.strip(' "')
+def pvname_to_attribute(pvname):
+    name = pvname.strip(' "')
     attr = name.replace(':', '_')
     if not attr.isidentifier():
-        logger.warning('Bad attr name; skipping: %s %s', name, attr)
-        return
+        # logger.warning('Bad attr name; assigning random: %s %s', name, attr)
+        # return 'attr_' + str(uuid.uuid4())[:8]
+        return f'_{attr}'
     return attr
 
 
 def component_from_record_pair(input_record, output_record):
     if output_record:
-        return ophyd.Component(ophyd.EpicsSignal, input_record.pvname,
+        return ophyd.Component(ophyd.EpicsSignal,
+                               input_record.pvname,
                                write_pv=output_record.pvname, kind='normal'
                                )
     return ophyd.Component(ophyd.EpicsSignalRO, input_record.pvname,
                            kind='normal')
 
 
+class Node:
+    def __init__(self, prefix, parent=None, children=None):
+        self.children = children or {}
+        self.parent = parent
+        self.pairs = []
+        self.prefix = prefix
+        self.device_class = None
+
+    @property
+    def size(self):
+        child_size = sum(child.size for child in self.children.values())
+        return len(self.pairs) + child_size
+
+    def add(self, item, pair):
+        prefix, *suffix = item
+        if not suffix:
+            return self.pairs.append(pair)
+
+        if prefix not in self.children:
+            self.children[prefix] = Node(prefix=self.prefix + [prefix],
+                                         parent=self)
+        self.children[prefix].add(suffix, pair)
+
+    def _create_device_class(self, threshold):
+        components = {}
+        for prefix, child in sorted(self.children.items(),
+                                    key=lambda kv: kv[1].prefix[-1]):
+            attr = pvname_to_attribute(child.prefix[-1])
+            components[attr] = ophyd.Component(
+                child.create_device_class(threshold=threshold),
+                '',   # full PVname, no prefix combining
+                # child.prefix[-1] + ':'
+            )
+
+        for input_record, output_record in self.pairs:
+            attr = pvname_to_attribute(input_record.pvname)
+            components[attr] = component_from_record_pair(input_record,
+                                                          output_record)
+
+        name = (pvname_to_attribute(self.prefix[-1].capitalize())
+                if self.prefix else 'PLC')
+        self.device_class = ophyd.device.create_device_from_components(
+            name, **components
+        )
+        return self.device_class
+
+    def _squash_children(self):
+        def add_pairs(descendent):
+            self.pairs.extend(descendent.pairs)
+
+        for child in self.children.values():
+            add_pairs(child)
+            for descendent in child.walk_depth_first():
+                add_pairs(descendent)
+        self.children.clear()
+
+    def create_device_class(self, threshold):
+        if self.size < threshold:
+            self._squash_children()
+        return self._create_device_class(threshold=threshold)
+
+    def walk_depth_first(self):
+        for prefix, child in self.children.items():
+            yield from child.walk_depth_first()
+        yield self
+
+    @classmethod
+    def build_tree(cls, attr_to_pairs, delim=':'):
+        root = cls(prefix=[])
+        for attr, (input_record, output_record) in attr_to_pairs.items():
+            root.add(input_record.pvname.split(delim), (input_record,
+                                                        output_record))
+        return root
+
+
 def ophyd_device_from_plc(plc_name, plc_project, macros, *, includes=None,
-                          excludes=None):
+                          excludes=None, flat=False):
     tmc = pytmc.parser.parse(plc_project.tmc_path)
 
     packages, exceptions = process(tmc, allow_errors=True,
                                    show_error_context=True)
 
     attr_to_pairs = {
-        record_to_attribute(input_record): (input_record, output_record)
+        pvname_to_attribute(input_record.pvname): (input_record, output_record)
         for input_record, output_record in records_from_packages(packages,
                                                                  macros)
-        if record_to_attribute(input_record)
+        if pvname_to_attribute(input_record.pvname)
     }
 
-    # build_tree(attr_to_pairs)
-    components = {
-        attr: component_from_record_pair(input_record, output_record)
+    attr_to_pairs = {
+        attr: (input_record, output_record)
         for attr, (input_record, output_record) in attr_to_pairs.items()
         if util.should_filter(includes, excludes, [attr, input_record.pvname])
     }
-    device_cls = ophyd.device.create_device_from_components(
-        plc_name.capitalize(), **components)
+
+    if flat:
+        components = {
+            attr: component_from_record_pair(input_record, output_record)
+            for attr, (input_record, output_record) in attr_to_pairs.items()
+        }
+        device_cls = ophyd.device.create_device_from_components(
+            plc_name.capitalize(), **components)
+    else:
+        root = Node.build_tree(attr_to_pairs)
+        device_cls = root.create_device_class(threshold=50)
 
     return device_cls('', name=plc_name)
 
@@ -152,11 +240,16 @@ def main(project, *, plcs=None, include=None, exclude=None, macro=None,
             try:
                 device = ophyd_device_from_plc(plc_name, plc_project, macros,
                                                includes=include,
-                                               excludes=exclude)
+                                               excludes=exclude,
+                                               flat=flat)
             except Exception:
                 logger.exception('Failed to create device for plc %s',
                                  plc_name)
                 raise
+
+        for sig in typhos.utils.get_all_signals_from_device(device):
+            logger.debug("Signal: %s", sig)
+
         devices.append(device)
 
     typhos.cli.get_qapp()
