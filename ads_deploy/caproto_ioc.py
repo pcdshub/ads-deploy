@@ -146,12 +146,12 @@ def create_ioc_from_records(record_pairs, *, class_name, default_values=None,
 
     for input_record, output_record in record_pairs:
         output_prop = None
-        if output_record and typhos_gui.record_to_attribute(output_record):
-            output_prop = create_pvproperty(
-                typhos_gui.record_to_attribute(output_record),
-                output_record)
+        if output_record:
+            output_attr = typhos_gui.pvname_to_attribute(output_record.pvname)
+            if output_attr:
+                output_prop = create_pvproperty(output_attr, output_record)
 
-        input_attr = typhos_gui.record_to_attribute(input_record)
+        input_attr = typhos_gui.pvname_to_attribute(input_record.pvname)
         if not input_attr:
             continue
 
