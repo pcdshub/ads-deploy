@@ -19,7 +19,7 @@ def write_script(filename, header, script_text, *, pause=True):
     print(f'* Wrote script: {filename}')
 
 
-stcmd, DeployRoot, SolutionDir, IocMountPath, DockerImage = sys.argv[1:]
+ioc_path, DeployRoot, SolutionDir, SolutionFilename, IocMountPath, DockerImage = sys.argv[1:]
 
 try:
     settings = run_path(pathlib.Path(IocMountPath) / "deploy_config.py")
@@ -30,15 +30,16 @@ except Exception as ex:
     settings = None
 
 
-ioc_path = pathlib.Path(stcmd).parent.absolute()
+ioc_path = pathlib.Path(ioc_path).absolute()
 
 local_net_id = settings.get('local_net_id', 'UNKNOWN')
 project = settings.get('projects', ['Unknown'])[0]
 
 spawn_docker = f'''
-"C:/Program Files/Docker/Docker/resources/bin/docker.exe" run ^
-        -v "{DeployRoot}:/ads-deploy/tools" ^
+docker run ^
+        -v "{DeployRoot}:/ads-deploy" ^
         -v "{SolutionDir}:{IocMountPath}" ^
+	-e PYTHONPATH=/ads-deploy ^
 	-e DISPLAY=host.docker.internal:0.0 ^
 	-i {DockerImage} ^'''
 
@@ -60,13 +61,13 @@ pause
 
 
 write_script(
-    'windows_run-typhon-gui.cmd',
+    'windows_run-typhos-gui.cmd',
     pause=False,
     header=f'''\
-Starting Typhon...
+Starting typhos...
 ''',
 
     script_text=f'''\
 {spawn_docker}
-	"cd '{ioc_path}' && pytmc stcmd --template-path /ads-deploy/tools/templates --template typhon_display.py --only-motor """{IocMountPath}/{project}""" > /tmp/display.py && echo 'Running Typhon...' && python /tmp/display.py; sleep 1"
+	"cd '{ioc_path}' && python -m ads_deploy typhos """{IocMountPath}/{SolutionFilename}"""; sleep 2"
 ''')

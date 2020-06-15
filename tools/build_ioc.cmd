@@ -1,10 +1,21 @@
-@CALL %~dp0\make_scripts.cmd %1 %2 %3 %4 %5 %6 %7
+@CALL %~dp0\config.cmd %1 %2 %3 %4 %5 %6 %7
 @IF [%ConfigSuccess%] == [0] GOTO Fail
 
-%RunDocker% %DockerImage% "find '%IocMountPath%/iocBoot' -type d -maxdepth 1 -name 'ioc*' -exec make PYTMC_ARGS=--debug -C {} \;"
+@echo.
+@echo %Divider%
+@echo - Creating IOC boot directories and Makefiles
+@CALL %~dp0\create_iocboot.cmd %1 %2 %3 %4 %5 %6 %7
 
-@echo Done
+@echo.
+@echo %Divider%
+@echo - Attempting to build the IOC
+%RunDocker% %DockerImage% "find '%IocMountPath%/iocBoot' -type d -maxdepth 1 -name 'ioc*' -exec make -C {} \;"
+
+if %ERRORLEVEL% NEQ 0 (
+    GOTO :Fail
+)
+
 @GOTO :eof
 
 :Fail
-@echo ** FAILED **
+@echo ** FAILED - see error messages above **

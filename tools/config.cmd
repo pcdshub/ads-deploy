@@ -5,6 +5,7 @@ SET DeployRoot=%~dp0%..\
 
 SET SolutionDir=%1
 SET SolutionFilename=%2
+SET UserArguments=%3 %4 %5 %6 %7 %8 %9
 
 SET SolutionDir=%SolutionDir:~1,-1%
 SET SolutionFilename=%SolutionFilename:~1,-1%

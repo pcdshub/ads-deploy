@@ -2,7 +2,7 @@
 @IF [%ConfigSuccess%] == [0] GOTO Fail
 
 @echo on
-@%RunDocker% %DockerImage% "find '%IocMountPath%' -type f -name '*.tsproj' -exec pytmc summary --all --code --markdown '{}' \;"
+@%RunDocker% %DockerImage% "pytmc summary --all --code --markdown '%SolutionLinuxPath%'"  > %SolutionName%.summary.txt && notepad %SolutionName%.summary.txt
 
 @GOTO :eof
 
