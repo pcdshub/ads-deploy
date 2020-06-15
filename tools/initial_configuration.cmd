@@ -6,7 +6,7 @@
     call set IPAddresses=%%IPAddresses%%%%f
 )
 
-%RunDocker% %DockerImage% "python -m ads_deploy config '%solutionLinuxPath%' --net-id --ip %IPAddresses%"
+%RunDocker% %DockerImage% "python -m ads_deploy config '%SolutionLinuxPath%' --net-id --ip %IPAddresses%"
 
 @echo Opening the deploy configuration script in notepad.
 @echo Close notepad when you have updated the settings to continue...
@@ -14,12 +14,12 @@
 @notepad deploy_config.py
 
 @echo.
-@echo ---------------------------------------------------
+@echo %Divider%
 @echo - Creating IOC boot directories and Makefiles
 @CALL %~dp0\create_iocboot.cmd %1 %2 %3 %4 %5 %6 %7
 
 @echo.
-@echo ---------------------------------------------------
+@echo %Divider%
 @echo - Attempting to build the IOC
 @CALL %~dp0\build_ioc.cmd %1 %2 %3 %4 %5 %6 %7
 

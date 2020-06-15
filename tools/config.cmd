@@ -17,15 +17,16 @@ IF [%SolutionDir:~-2%]==[\\] (
 SET SolutionFullPath="%SolutionDir%%SolutionName%"
 SET IocMountPath=/reg/g/pcds/epics/ioc/%SolutionName%
 SET SolutionLinuxPath=/reg/g/pcds/epics/ioc/%SolutionName%/%SolutionFilename%
+SET Divider=------------------------------------------------------------------------------------------------------------------------
 
 if not [%AdsDeployConfigured%] == [1] (
-	echo ----------------------------------------------------------------------
+	echo %Divider%
 	echo Solution directory:      %SolutionDir%
 	echo Solution name:           %SolutionName%
 	echo Solution filename:       %SolutionFilename%
 	echo Solution full path:      %SolutionFullPath%
 	echo IOC mount path:          %IocMountPath%
-	echo ----------------------------------------------------------------------
+	echo %Divider%
 	echo.
 )
 
