@@ -20,8 +20,11 @@ try:
     import pcdsdevices
     import pcdsdevices.epics_motor
 except ImportError:
-    pcdsdevices = None
     # TODO: pcdsdevices is a heavy import with many requirements
+    pcdsdevices = None
+    MOTOR_CLASS = ophyd.EpicsMotor
+else:
+    MOTOR_CLASS = pcdsdevices.epics_motor.BeckhoffAxis
 
 
 DESCRIPTION = __doc__
@@ -218,20 +221,19 @@ def ophyd_device_from_plc(plc_name, plc_project, macros, *, includes=None,
     }
 
     motors = {}
-    if pcdsdevices is not None:
-        for motor in tmc.find(pytmc.parser.Symbol_DUT_MotionStage):
-            if motor.is_pointer:
-                continue
+    for motor in tmc.find(pytmc.parser.Symbol_DUT_MotionStage):
+        if motor.is_pointer:
+            continue
 
-            if util.should_filter(includes, excludes, ['motor', motor.name]):
-                prefix = ''.join(
-                    pytmc.bin.stcmd.get_name(motor, {'prefix': plc_name,
-                                                     'delim': ':'})
-                )
+        if not util.should_filter(includes, excludes, ['motor', motor.name]):
+            continue
 
-                attr = pvname_to_attribute(prefix)
-                motors[attr] = ophyd.Component(
-                    pcdsdevices.epics_motor.BeckhoffAxis, prefix)
+        prefix = ''.join(
+            pytmc.bin.stcmd.get_name(motor, {'prefix': plc_name, 'delim': ':'})
+        )
+
+        attr = pvname_to_attribute(prefix)
+        motors[attr] = ophyd.Component(MOTOR_CLASS, prefix)
 
     if flat:
         components = {
