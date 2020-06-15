@@ -60,6 +60,12 @@ def build_arg_parser(parser=None):
         help='Specify one or more PLC names to generate'
     )
 
+    parser.add_argument(
+        '--flat',
+        action='store_true',
+        help='Create a flat device hierarchy'
+    )
+
     return parser
 
 
@@ -90,21 +96,13 @@ def record_to_attribute(record):
     return attr
 
 
-def components_from_records(records):
-    for input_record, output_record in records:
-        attr = record_to_attribute(input_record)
-        if not attr:
-            continue
-
-        if output_record:
-            component = ophyd.Component(
-                ophyd.EpicsSignal, input_record.pvname,
-                write_pv=output_record.pvname, kind='normal')
-        else:
-            component = ophyd.Component(
-                ophyd.EpicsSignalRO, input_record.pvname, kind='normal')
-
-        yield attr, component
+def component_from_record_pair(input_record, output_record):
+    if output_record:
+        return ophyd.Component(ophyd.EpicsSignal, input_record.pvname,
+                               write_pv=output_record.pvname, kind='normal'
+                               )
+    return ophyd.Component(ophyd.EpicsSignalRO, input_record.pvname,
+                           kind='normal')
 
 
 def ophyd_device_from_plc(plc_name, plc_project, macros, *, includes=None,
@@ -114,10 +112,18 @@ def ophyd_device_from_plc(plc_name, plc_project, macros, *, includes=None,
     packages, exceptions = process(tmc, allow_errors=True,
                                    show_error_context=True)
 
-    records = records_from_packages(packages, macros)
+    attr_to_pairs = {
+        record_to_attribute(input_record): (input_record, output_record)
+        for input_record, output_record in records_from_packages(packages,
+                                                                 macros)
+        if record_to_attribute(input_record)
+    }
+
+    # build_tree(attr_to_pairs)
     components = {
-        attr: cpt for attr, cpt in components_from_records(records)
-        if util.should_filter(includes, excludes, [attr, cpt.suffix])
+        attr: component_from_record_pair(input_record, output_record)
+        for attr, (input_record, output_record) in attr_to_pairs.items()
+        if util.should_filter(includes, excludes, [attr, input_record.pvname])
     }
     device_cls = ophyd.device.create_device_from_components(
         plc_name.capitalize(), **components)
@@ -125,7 +131,8 @@ def ophyd_device_from_plc(plc_name, plc_project, macros, *, includes=None,
     return device_cls('', name=plc_name)
 
 
-def main(project, *, plcs=None, include=None, exclude=None, macro=None):
+def main(project, *, plcs=None, include=None, exclude=None, macro=None,
+         flat=False):
     macros = util.split_macros(macro or [])
     include = include or []
     exclude = exclude or []
@@ -149,6 +156,7 @@ def main(project, *, plcs=None, include=None, exclude=None, macro=None):
             except Exception:
                 logger.exception('Failed to create device for plc %s',
                                  plc_name)
+                raise
         devices.append(device)
 
     typhos.cli.get_qapp()
