@@ -3,7 +3,7 @@
 
 @echo Creating windows_run-ioc-in-docker.cmd and windows_run-typhon-gui.cmd...
 
-%RunDocker% %DockerImage% "find '%IocMountPath%/iocBoot' -maxdepth 2 -type f -name st.cmd -exec python /ads-deploy/tools/python/make_scripts.py {} '%DeployRoot%' '%SolutionDir%' '%IocMountPath%' '%DockerImage%' \;"
+%RunDocker% %DockerImage% "find '%IocMountPath%/iocBoot' -maxdepth 2 -type f -name st.cmd -exec python /ads-deploy/tools/python/make_scripts.py {} '%DeployRoot%\tools' '%SolutionDir%' '%IocMountPath%' '%DockerImage%' \;"
 
 @echo Done
 @GOTO :eof

@@ -121,7 +121,7 @@ def create_iocboot_for_plc(tsproj_project, plc, *, ioc_name, makefile_path,
     """
     ioc_template_path = makefile_path.parent
     jinja_env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(ioc_template_path),
+        loader=jinja2.FileSystemLoader(str(ioc_template_path)),
         trim_blocks=True,
         lstrip_blocks=True,
     )

@@ -1,7 +1,8 @@
 @echo off
 SET DockerImage=pcdshub/ads-deploy:latest
 
-SET DeployRoot=%~dp0
+SET DeployRoot=%~dp0%..\
+
 SET SolutionDir=%1
 SET SolutionFilename=%2
 
@@ -15,6 +16,7 @@ IF [%SolutionDir:~-2%]==[\\] (
 
 SET SolutionFullPath="%SolutionDir%%SolutionName%"
 SET IocMountPath=/reg/g/pcds/epics/ioc/%SolutionName%
+SET SolutionLinuxPath=/reg/g/pcds/epics/ioc/%SolutionName%/%SolutionFilename%
 
 if not [%AdsDeployConfigured%] == [1] (
 	echo ----------------------------------------------------------------------
@@ -38,8 +40,9 @@ IF "%SolutionFilename%" == "" (
 )
 
 SET RunDocker=docker run ^
-    -v "%DeployRoot%:/ads-deploy/tools" ^
+    -v "%DeployRoot%:/ads-deploy" ^
     -v "%SolutionDir%:%IocMountPath%" ^
+	-e PYTHONPATH=/ads-deploy ^
 	-e DISPLAY=host.docker.internal:0.0 ^
     -i
 
