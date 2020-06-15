@@ -101,12 +101,19 @@ def pvname_to_attribute(pvname):
 
 
 def component_from_record_pair(input_record, output_record):
+    rtyp = input_record.record_type
+    string = (rtyp == 'stringin' or
+              (rtyp == 'waveform' and input_record.fields['FTVL'] == 'CHAR')
+              )
+
     if output_record:
         return ophyd.Component(ophyd.EpicsSignal,
                                input_record.pvname,
-                               write_pv=output_record.pvname, kind='normal'
+                               write_pv=output_record.pvname, kind='normal',
+                               string=string,
                                )
     return ophyd.Component(ophyd.EpicsSignalRO, input_record.pvname,
+                           string=string,
                            kind='normal')
 
 

@@ -97,7 +97,13 @@ def create_ioc_from_records(record_pairs, *, class_name, default_values=None,
             'stringout': "",
             'mbbi': 0,
             'mbbo': 0,
-            'waveform': [0, 0],
+            'waveform': {
+                'CHAR': 'unset',
+                'SHORT': [0],
+                'LONG': [0],
+                'FLOAT': [0.],
+                'DOUBLE': [0.],
+            }
         }
 
     async def startup_hook(group, instance, async_lib):
@@ -128,9 +134,21 @@ def create_ioc_from_records(record_pairs, *, class_name, default_values=None,
     def create_pvproperty(attr, record):
         startup_fields[attr] = {}
         default_value = default_values.get(record.record_type, 0)
+        if record.record_type == 'waveform':
+            ftvl = record.fields.get('FTVL', 'SHORT')
+            nelm = int(record.fields.get('NELM', 1))
+            default_value = default_value[ftvl]
+            if ftvl != 'CHAR':
+                default_value = default_value * nelm
+
+        if 'VAL' in record.fields:
+            value = type(default_value)(record.fields['VAL'])
+        else:
+            value = default_value
+
         prop = pvproperty(
             name=record.pvname,
-            value=record.fields.get('VAL', default_value),
+            value=value,
             record=record.record_type,
         )
 
