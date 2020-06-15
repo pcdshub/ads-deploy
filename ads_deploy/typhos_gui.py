@@ -8,6 +8,7 @@ import logging
 
 import ophyd
 import pytmc
+import pytmc.bin.stcmd
 from pytmc.bin.db import process
 
 import typhos
@@ -15,7 +16,12 @@ import typhos.cli
 
 from . import util
 
-# import uuid
+try:
+    import pcdsdevices
+    import pcdsdevices.epics_motor
+except ImportError:
+    pcdsdevices = None
+    # TODO: pcdsdevices is a heavy import with many requirements
 
 
 DESCRIPTION = __doc__
@@ -94,8 +100,6 @@ def pvname_to_attribute(pvname):
     name = pvname.strip(' "')
     attr = name.replace(':', '_')
     if not attr.isidentifier():
-        # logger.warning('Bad attr name; assigning random: %s %s', name, attr)
-        # return 'attr_' + str(uuid.uuid4())[:8]
         return f'_{attr}'
     return attr
 
@@ -140,13 +144,14 @@ class Node:
                                          parent=self)
         self.children[prefix].add(suffix, pair)
 
-    def _create_device_class(self, threshold):
-        components = {}
+    def _create_device_class(self, threshold, components):
+        components = dict(components)
         for prefix, child in sorted(self.children.items(),
                                     key=lambda kv: kv[1].prefix[-1]):
             attr = pvname_to_attribute(child.prefix[-1])
             components[attr] = ophyd.Component(
-                child.create_device_class(threshold=threshold),
+                child.create_device_class(threshold=threshold,
+                                          components={}),
                 '',   # full PVname, no prefix combining
                 # child.prefix[-1] + ':'
             )
@@ -173,10 +178,10 @@ class Node:
                 add_pairs(descendent)
         self.children.clear()
 
-    def create_device_class(self, threshold):
+    def create_device_class(self, threshold, components):
         if self.size < threshold:
             self._squash_children()
-        return self._create_device_class(threshold=threshold)
+        return self._create_device_class(threshold, components)
 
     def walk_depth_first(self):
         for prefix, child in self.children.items():
@@ -212,16 +217,32 @@ def ophyd_device_from_plc(plc_name, plc_project, macros, *, includes=None,
         if util.should_filter(includes, excludes, [attr, input_record.pvname])
     }
 
+    motors = {}
+    if pcdsdevices is not None:
+        for motor in tmc.find(pytmc.parser.Symbol_DUT_MotionStage):
+            if motor.is_pointer:
+                continue
+
+            if util.should_filter(includes, excludes, ['motor', motor.name]):
+                prefix = ''.join(
+                    pytmc.bin.stcmd.get_name(motor, {'prefix': plc_name,
+                                                     'delim': ':'})
+                )
+
+                attr = pvname_to_attribute(prefix)
+                motors[attr] = ophyd.Component(
+                    pcdsdevices.epics_motor.BeckhoffAxis, prefix)
+
     if flat:
         components = {
             attr: component_from_record_pair(input_record, output_record)
             for attr, (input_record, output_record) in attr_to_pairs.items()
         }
         device_cls = ophyd.device.create_device_from_components(
-            plc_name.capitalize(), **components)
+            plc_name.capitalize(), **components, **motors)
     else:
         root = Node.build_tree(attr_to_pairs)
-        device_cls = root.create_device_class(threshold=50)
+        device_cls = root.create_device_class(threshold=50, components=motors)
 
     return device_cls('', name=plc_name)
 
