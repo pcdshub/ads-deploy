@@ -4,7 +4,7 @@
 IF "%UseDocker%" == "1" (
     %RunDocker% %DockerImage% "find '%IocMountPath%' -type f -name '*.tsproj' -exec pytmc pragmalint '{}' \;"
 ) ELSE (
-   call python -m ads_deploy tsproj "%SolutionFullPath%"
+    FOR /F "delims= tokens=1" %%F in ('call python -m ads_deploy tsproj "%SolutionFullPath%"') DO pytmc pragmalint "%%F"
 )
 
 if %ERRORLEVEL% NEQ 0 (
