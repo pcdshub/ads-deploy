@@ -1,5 +1,7 @@
 @echo off
 SET DockerImage=pcdshub/ads-deploy:latest
+REM The default, which can be overridden in `select_conda_or_docker.cmd`
+SET AdsDeployUseDocker=1
 
 SET DeployRoot=%~dp0%..\
 
@@ -48,11 +50,13 @@ SET RunDocker=docker run ^
 	-e DISPLAY=host.docker.internal:0.0 ^
     -i
 
-@CALL %DeployRoot%\tools\conda_config.cmd
+CALL %DeployRoot%\tools\conda_config.cmd
+CALL %DeployRoot%\tools\select_conda_or_docker.cmd
 
-IF "%UseDocker%" == "1" (
-    @echo ** Docker mode **
+IF %AdsDeployUseDocker% EQU 1 (
+    echo ** Docker mode **
 ) ELSE (
+    echo ** Conda mode **
     call conda activate %ADS_DEPLOY_CONDA_ENV%
     IF %ERRORLEVEL% NEQ 0 (
         echo Conda not installed correctly.
