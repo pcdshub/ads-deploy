@@ -49,3 +49,10 @@ SET RunDocker=docker run ^
     -i
 
 SET AdsDeployConfigured=1
+
+IF "%UseDocker%" == "1" (
+    @echo ** Docker mode **
+) ELSE (
+    @echo ** Conda mode **
+    @CALL %~dp0\conda_config.cmd
+)

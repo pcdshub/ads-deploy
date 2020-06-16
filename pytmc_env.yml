@@ -1,4 +1,6 @@
-ipython>=7.10
-typhos>=1.0
-pydm==1.10.1
 epics-base
+ipython>=7.10
+pydm==1.10.1
+python>=3.7,<3.8
+pytmc==2.6.5
+typhos>=1.0

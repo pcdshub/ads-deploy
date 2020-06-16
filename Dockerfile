@@ -22,7 +22,7 @@ RUN pip install --upgrade pip
 RUN conda config --add channels conda-forge
 RUN conda install --channel conda-forge --file pytmc_env.yml
 
-RUN pip install pytmc==2.6.5 pyads==3.2.1
+RUN pip install pyads==3.2.1
 
 ENV ADS_IOC_ROOT       /reg/g/pcds/epics/ioc/common/ads-ioc
 ENV ADS_IOC_VERSION    R0.2.4

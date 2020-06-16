@@ -1,7 +1,11 @@
 @CALL %~dp0\config.cmd %1 %2 %3 %4 %5 %6 %7
 @IF [%ConfigSuccess%] == [0] GOTO Fail
 
-%RunDocker% %DockerImage% "find '%IocMountPath%' -type f -name '*.tsproj' -exec pytmc pragmalint '{}' \;"
+IF "%UseDocker%" == "1" (
+    %RunDocker% %DockerImage% "find '%IocMountPath%' -type f -name '*.tsproj' -exec pytmc pragmalint '{}' \;"
+) ELSE (
+    @echo Conda TODO
+)
 
 if %ERRORLEVEL% NEQ 0 (
     @echo ** FAILED - see error messages above **
