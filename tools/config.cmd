@@ -50,9 +50,19 @@ SET RunDocker=docker run ^
 
 SET AdsDeployConfigured=1
 
+@CALL %DeployRoot%\tools\conda_config.cmd
+
 IF "%UseDocker%" == "1" (
     @echo ** Docker mode **
 ) ELSE (
-    @echo ** Conda mode **
-    @CALL %~dp0\conda_config.cmd
+    set ADS_DEPLOY_CONDA
+    call conda activate %ADS_DEPLOY_CONDA_ENV%
+
+    echo * ADS deploy version:
+    call python -m ads_deploy --version 2>nul
+
+    IF %ERRORLEVEL% NEQ 0 (
+        echo Conda not installed correctly.
+        EXIT 1
+    )
 )

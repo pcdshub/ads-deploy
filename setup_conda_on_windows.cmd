@@ -1,5 +1,7 @@
 @ECHO OFF
 
+SETLOCAL UseDocker=0
+
 COLOR
 echo * Checking conda is installed...
 call conda --version
@@ -17,7 +19,7 @@ CALL %~dp0\tools\conda_config.cmd
 
 echo.
 echo * Creating the environment %ADS_DEPLOY_CONDA_ENV%...
-conda create -y --name %ADS_DEPLOY_CONDA_ENV% --override-channels --channel conda-forge --channel defaults --file pytmc_env.yml
+call conda create -y --name %ADS_DEPLOY_CONDA_ENV% --override-channels --channel conda-forge --channel defaults --file pytmc_env.yml
 
 IF %ERRORLEVEL% NEQ 0 (
     setlocal FAIL_REASON=Failed to create the ads-deploy conda environment.
