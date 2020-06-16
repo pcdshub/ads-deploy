@@ -15,7 +15,7 @@ IF [%SolutionDir:~-2%]==[\\] (
     SET SolutionDir=%SolutionDir:~0,-1%
 )
 
-SET SolutionFullPath="%SolutionDir%%SolutionName%"
+SET "SolutionFullPath=%SolutionDir%%SolutionFilename%"
 SET IocMountPath=/reg/g/pcds/epics/ioc/%SolutionName%
 SET SolutionLinuxPath=/reg/g/pcds/epics/ioc/%SolutionName%/%SolutionFilename%
 SET Divider=------------------------------------------------------------------------------------------------------------------------
@@ -48,16 +48,17 @@ SET RunDocker=docker run ^
 	-e DISPLAY=host.docker.internal:0.0 ^
     -i
 
-SET AdsDeployConfigured=1
-
 @CALL %DeployRoot%\tools\conda_config.cmd
 
 IF "%UseDocker%" == "1" (
     @echo ** Docker mode **
 ) ELSE (
-    set ADS_DEPLOY_CONDA
     call conda activate %ADS_DEPLOY_CONDA_ENV%
+    echo Conda settings:
+    set ADS_DEPLOY_CONDA
+    set CONDA
 
+    echo.
     echo * ADS deploy version:
     call python -m ads_deploy --version 2>nul
 
@@ -66,3 +67,5 @@ IF "%UseDocker%" == "1" (
         EXIT 1
     )
 )
+
+SET AdsDeployConfigured=1

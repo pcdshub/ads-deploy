@@ -19,6 +19,7 @@ MODULES = {
     'iocboot': 'iocboot',
     'typhos_gui': 'typhos',
     'caproto_ioc': 'caproto',
+    'tsproj': 'tsproj',
 }
 
 

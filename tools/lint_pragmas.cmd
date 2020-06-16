@@ -4,7 +4,7 @@
 IF "%UseDocker%" == "1" (
     %RunDocker% %DockerImage% "find '%IocMountPath%' -type f -name '*.tsproj' -exec pytmc pragmalint '{}' \;"
 ) ELSE (
-    @echo Conda TODO
+   call python -m ads_deploy tsproj "%SolutionFullPath%"
 )
 
 if %ERRORLEVEL% NEQ 0 (
