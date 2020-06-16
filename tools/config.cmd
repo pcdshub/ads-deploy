@@ -53,23 +53,26 @@ SET RunDocker=docker run ^
 CALL %DeployRoot%\tools\conda_config.cmd
 CALL %DeployRoot%\tools\select_conda_or_docker.cmd
 
-IF %AdsDeployUseDocker% EQU 1 (
-    echo ** Docker mode **
-) ELSE (
-    echo ** Conda mode **
-    call conda activate %ADS_DEPLOY_CONDA_ENV%
-    IF %ERRORLEVEL% NEQ 0 (
-        echo Conda not installed correctly.
-        EXIT 1
+if not [%AdsDeployConfigured%] == [1] (
+    IF %AdsDeployUseDocker% EQU 1 (
+        echo ** Docker mode **
+    ) ELSE (
+        echo ** Conda mode **
+        call conda activate %ADS_DEPLOY_CONDA_ENV%
+        IF %ERRORLEVEL% NEQ 0 (
+            echo Conda not installed correctly.
+            EXIT 1
+        )
+
+        set ADS_DEPLOY_CONDA_ENV
+
+        set ADS_IOC_LOCATION=C:\Repos\ads-ioc
+        REM The following is handy (but so slow)...
+        REM echo.
+        REM echo * ADS deploy version:
+        REM call python -m ads_deploy --version 2>nul
+
     )
-
-    set ADS_DEPLOY_CONDA_ENV
-
-    REM The following is handy (but so slow)...
-    REM echo.
-    REM echo * ADS deploy version:
-    REM call python -m ads_deploy --version 2>nul
-
 )
 
 SET AdsDeployConfigured=1
