@@ -8,7 +8,7 @@
         <UserCreatedTool>
           <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
           <CloseOnExit>true</CloseOnExit>
-          <Command>C:\Repos\ads-deploy\tools\lint_pragmas.cmd</Command>
+          <Command>C:\Repos\ads-deploy\windows\lint_pragmas.cmd</Command>
           <Index>0</Index>
           <InitialDirectory>$(SolutionDir)</InitialDirectory>
           <IsGUIapp>false</IsGUIapp>
@@ -24,7 +24,7 @@
         <UserCreatedTool>
           <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
           <CloseOnExit>true</CloseOnExit>
-          <Command>c:\repos\ads-deploy\tools\build_ioc.cmd</Command>
+          <Command>c:\repos\ads-deploy\windows\build_ioc.cmd</Command>
           <Index>1</Index>
           <InitialDirectory>$(SolutionDir)</InitialDirectory>
           <IsGUIapp>false</IsGUIapp>
@@ -40,7 +40,7 @@
         <UserCreatedTool>
           <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
           <CloseOnExit>true</CloseOnExit>
-          <Command>c:\repos\ads-deploy\tools\run_ioc.cmd</Command>
+          <Command>c:\repos\ads-deploy\windows\run_ioc.cmd</Command>
           <Index>2</Index>
           <InitialDirectory>$(SolutionDir)</InitialDirectory>
           <IsGUIapp>false</IsGUIapp>
@@ -56,7 +56,7 @@
         <UserCreatedTool>
           <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
           <CloseOnExit>true</CloseOnExit>
-          <Command>C:\repos\ads-deploy\tools\motor_screens.cmd</Command>
+          <Command>C:\repos\ads-deploy\windows\motor_screens.cmd</Command>
           <Index>3</Index>
           <InitialDirectory>$(SolutionDir)</InitialDirectory>
           <IsGUIapp>false</IsGUIapp>
@@ -72,7 +72,7 @@
         <UserCreatedTool>
           <Arguments>$(SolutionDir) $(SolutionFileName) --include motor --exclude abc</Arguments>
           <CloseOnExit>true</CloseOnExit>
-          <Command>C:\Repos\ads-deploy\tools\other_screens.cmd</Command>
+          <Command>C:\Repos\ads-deploy\windows\other_screens.cmd</Command>
           <Index>4</Index>
           <InitialDirectory>$(SolutionDir)</InitialDirectory>
           <IsGUIapp>false</IsGUIapp>
@@ -88,7 +88,7 @@
         <UserCreatedTool>
           <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
           <CloseOnExit>true</CloseOnExit>
-          <Command>C:\Repos\ads-deploy\tools\debug_records.cmd</Command>
+          <Command>C:\Repos\ads-deploy\windows\debug_records.cmd</Command>
           <Index>5</Index>
           <InitialDirectory>$(SolutionDir)</InitialDirectory>
           <IsGUIapp>false</IsGUIapp>
@@ -104,7 +104,7 @@
         <UserCreatedTool>
           <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
           <CloseOnExit>true</CloseOnExit>
-          <Command>C:\Repos\ads-deploy\tools\summary.cmd</Command>
+          <Command>C:\Repos\ads-deploy\windows\summary.cmd</Command>
           <Index>6</Index>
           <InitialDirectory>$(SolutionDir)</InitialDirectory>
           <IsGUIapp>false</IsGUIapp>
@@ -120,7 +120,7 @@
         <UserCreatedTool>
           <Arguments>$(SolutionDir) $(SolutionFileName)</Arguments>
           <CloseOnExit>true</CloseOnExit>
-          <Command>C:\repos\ads-deploy\tools\qt_designer.cmd</Command>
+          <Command>C:\repos\ads-deploy\windows\qt_designer.cmd</Command>
           <Index>7</Index>
           <InitialDirectory>$(SolutionDir)</InitialDirectory>
           <IsGUIapp>false</IsGUIapp>
@@ -129,6 +129,38 @@
           <PromptForArguments>false</PromptForArguments>
           <SaveAllDocs>true</SaveAllDocs>
           <Title>Qt Designer</Title>
+          <Unicode>false</Unicode>
+          <UseOutputWindow>false</UseOutputWindow>
+          <UseTaskList>false</UseTaskList>
+        </UserCreatedTool>
+        <UserCreatedTool>
+          <Arguments/>
+          <CloseOnExit>true</CloseOnExit>
+          <Command>C:\Repos\ads-deploy\switch_to_docker.cmd</Command>
+          <Index>8</Index>
+          <InitialDirectory>C:\Repos\ads-deploy\</InitialDirectory>
+          <IsGUIapp>false</IsGUIapp>
+          <NameID>0</NameID>
+          <Package>{00000000-0000-0000-0000-000000000000}</Package>
+          <PromptForArguments>false</PromptForArguments>
+          <SaveAllDocs>true</SaveAllDocs>
+          <Title>ads-deploy: use Docker</Title>
+          <Unicode>false</Unicode>
+          <UseOutputWindow>false</UseOutputWindow>
+          <UseTaskList>false</UseTaskList>
+        </UserCreatedTool>
+        <UserCreatedTool>
+          <Arguments/>
+          <CloseOnExit>true</CloseOnExit>
+          <Command>C:\Repos\ads-deploy\switch_to_conda.cmd</Command>
+          <Index>9</Index>
+          <InitialDirectory>C:\repos\ads-deploy</InitialDirectory>
+          <IsGUIapp>false</IsGUIapp>
+          <NameID>0</NameID>
+          <Package>{00000000-0000-0000-0000-000000000000}</Package>
+          <PromptForArguments>false</PromptForArguments>
+          <SaveAllDocs>true</SaveAllDocs>
+          <Title>ads-deploy: use Conda</Title>
           <Unicode>false</Unicode>
           <UseOutputWindow>false</UseOutputWindow>
           <UseTaskList>false</UseTaskList>

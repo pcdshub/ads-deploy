@@ -15,7 +15,7 @@ IF %ERRORLEVEL% NEQ 0 (
 call conda deactivate
 
 REM Source conda configuration env
-CALL %~dp0\tools\conda_config.cmd
+CALL %~dp0\windows\conda_config.cmd
 
 echo.
 echo * Creating the environment %ADS_DEPLOY_CONDA_ENV%...

@@ -50,8 +50,8 @@ SET RunDocker=docker run ^
 	-e DISPLAY=host.docker.internal:0.0 ^
     -i
 
-CALL %DeployRoot%\tools\conda_config.cmd
-CALL %DeployRoot%\tools\select_conda_or_docker.cmd
+CALL %DeployRoot%\windows\conda_config.cmd
+CALL %DeployRoot%\windows\select_conda_or_docker.cmd
 
 if not [%AdsDeployConfigured%] == [1] (
     IF %AdsDeployUseDocker% EQU 1 (
