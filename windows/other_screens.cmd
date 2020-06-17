@@ -3,11 +3,19 @@
 
 ECHO "ads-deploy typhos arguments: %UserArguments%"
 
-%RunDocker% %DockerImage% "python -m ads_deploy typhos '%SolutionLinuxPath%' %UserArguments%"
+IF %AdsDeployUseDocker% EQU 1 (
+    %RunDocker% %DockerImage% "python -m ads_deploy typhos '%SolutionLinuxPath%' %UserArguments%"
 
-if %ERRORLEVEL% NEQ 0 (
-    %RunDocker% %DockerImage% "python -m ads_deploy typhos '%SolutionLinuxPath%' --help"
-    pause
+    if %ERRORLEVEL% NEQ 0 (
+        %RunDocker% %DockerImage% "python -m ads_deploy typhos --help"
+        pause
+    )
+) ELSE (
+    call python -m ads_deploy typhos "%SolutionFullPath%" %UserArguments%
+    if %ERRORLEVEL% NEQ 0 (
+        call python -m ads_deploy typhos --help
+        pause
+    )
 )
 
 @echo Done
