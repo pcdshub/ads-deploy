@@ -2,7 +2,17 @@
 @IF [%ConfigSuccess%] == [0] GOTO Fail
 
 @echo on
-@%RunDocker% %DockerImage% "pytmc summary --all --code --markdown '%SolutionLinuxPath%'"  > %SolutionName%.summary.txt && notepad %SolutionName%.summary.txt
+IF %AdsDeployUseDocker% EQU 1 (
+    @%RunDocker% %DockerImage% "pytmc summary --all --code --markdown '%SolutionLinuxPath%'"  > %SolutionName%.summary.txt
+) ELSE (
+    call pytmc summary --all --code --markdown "%SolutionFullPath%" > %SolutionName%.summary.txt
+)
+
+IF EXIST %SolutionName%.summary.txt (
+    start /max %SolutionName%.summary.txt
+) ELSE (
+    echo Project summary not generated! Check for errors above.
+)
 
 @GOTO :eof
 
