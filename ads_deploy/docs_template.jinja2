@@ -1,0 +1,84 @@
+{%- macro chapter(title) %}
+{{ title | title_fill("*") }}
+{{ title }}
+{{ title | title_fill("*") }}{% endmacro -%}
+
+{%- macro section(title) %}
+{{ title }}
+{{ title | title_fill("=") }}{% endmacro -%}
+
+{%- macro subsection(title) %}
+{{ title }}
+{{ title | title_fill("-") }}{% endmacro -%}
+
+{%- macro subsubsection(title) %}
+{{ title }}
+{{ title | title_fill("^") }}{% endmacro -%}
+
+{%- macro paragraph(title) %}
+{{ title }}
+{{ title | title_fill('"') }}{% endmacro -%}
+
+.. contents:: :depth: 3
+
+{% for tsproj in tsprojects %}
+{{ chapter(tsproj.filename) }}
+
+{{ section("Pragmas") }}
+
+.. csv-table::
+    :header: PLC Name, Total Pragmas, Errors
+    :align: center
+
+    {% for plc in tsproj.plcs %}
+    :ref:`{{ plc.name }} <{{ plc.name }}_pragmas>`, {{ plc.pragma_count }}, {{ plc.pragma_errors }}
+    {% endfor %}
+
+{% for plc in tsproj.plcs %}
+{{ section(plc.name) }}
+
+{{ subsection('Settings') }}
+
+.. list-table::
+    :header-rows: 1
+    :align: center
+
+    * - Setting
+      - Value
+    * - AMS Net ID
+      - {{ plc.obj.ams_id | default("UNSET") }}
+    * - Target IP address
+      - {{ plc.obj.target_ip | default("UNSET") }}
+    * - AMS Port
+      - {{ plc.obj.port | default("UNSET") }}
+
+.. _{{ plc.name }}_pragmas:
+
+{{ subsection('Pragmas') }}
+
+Total pragmas found: {{ plc.pragma_count }}
+Total linter errors: {{ plc.pragma_errors }}
+
+        {% for filename, items in plc.linter_results | groupby('filename') %}
+            {{- subsubsection(filename) }}
+
+            {% for item in items %}
+#. Line {{ item.line_number }} ({{ item.exception.__class__.__name__ }})
+
+::
+
+    {{ item.exception | string | indent(4) }}
+
+    Full pragma:
+
+    {{ item.pragma | indent(4) }}
+
+            {% endfor %}
+        {% endfor %}
+
+    {% endfor %}
+
+{% endfor %}
+
+
+{{ chapter("EPICS Record Database") }}
