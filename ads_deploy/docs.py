@@ -19,11 +19,13 @@ import pathlib
 import jinja2
 import pytmc
 import pytmc.bin.pragmalint
+from pytmc import parser as pytmc_parser
 
 from . import util
 
 DESCRIPTION = __doc__
 MODULE_PATH = pathlib.Path(__file__).parent
+DEFAULT_TEMPLATES = [MODULE_PATH / 'docs_template.jinja2']
 logger = logging.getLogger(__name__)
 
 
@@ -49,8 +51,17 @@ def build_arg_parser(parser=None):
 
     parser.add_argument(
         '--template',
+        dest='templates',
         type=str,
-        help='Specify the template for documentation'
+        action='append',
+        help='Specify the template (or templates) for documentation'
+    )
+
+    parser.add_argument(
+        '--output',
+        dest='output_path',
+        type=str,
+        help='Write documentation to this location'
     )
 
     return parser
@@ -73,14 +84,15 @@ def lint_plc(plc_project):
             'linter_results': results}
 
 
-def main(project, plcs=None, template=None):
-    if template is not None:
-        template = pathlib.Path(template)
-    else:
-        template = MODULE_PATH / 'docs_template.jinja2'
+def get_jinja_environment(templates):
+    template_dirs = set(str(item.parent) for item in templates)
+
+    loader = jinja2.ChoiceLoader(
+        [jinja2.FileSystemLoader(str(path)) for path in template_dirs]
+    )
 
     jinja_env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(str(template.parent)),
+        loader=loader,
         trim_blocks=True,
         lstrip_blocks=True,
     )
@@ -90,12 +102,13 @@ def main(project, plcs=None, template=None):
         return fill_char * len(text)
 
     jinja_env.filters['title_fill'] = title_fill
+    return jinja_env
 
-    docs_template = jinja_env.get_template(template.name)
 
-    solution_path, projects = util.get_tsprojects_from_filename(project.name)
-
+def build_template_kwargs(solution_path, projects, plcs=None):
     render_args = {
+        'solution': solution_path,
+        'solution_name': solution_path.name if solution_path else None,
         'tsprojects': [],
     }
 
@@ -107,6 +120,9 @@ def main(project, plcs=None, template=None):
             filename=tsproj_project.name,
             plcs=[],
             obj=parsed_tsproj,
+            nc=list(parsed_tsproj.find(pytmc_parser.NC)),
+            boxes=list(parsed_tsproj.find(pytmc_parser.Box)),
+            links=list(parsed_tsproj.find(pytmc_parser.Link)),
         )
 
         render_args['tsprojects'].append(proj_info)
@@ -120,9 +136,28 @@ def main(project, plcs=None, template=None):
             plc_info = dict(
                 name=plc_name,
                 obj=plc_project,
+                tmc_path=plc_project.tmc_path,
+                symbols=list(plc_project.find(pytmc_parser.Symbol)),
             )
             proj_info['plcs'].append(plc_info)
 
             plc_info.update(**lint_plc(plc_project))
 
-    print(docs_template.render(**render_args))
+    return render_args
+
+
+def main(project, plcs=None, templates=None, output_path=None):
+    if templates is not None:
+        templates = [pathlib.Path(item) for item in templates]
+    else:
+        templates = DEFAULT_TEMPLATES
+
+    jinja_env = get_jinja_environment(templates)
+
+    solution_path, projects = util.get_tsprojects_from_filename(project.name)
+
+    render_args = build_template_kwargs(solution_path, projects, plcs=plcs)
+
+    for template_path in templates:
+        template = jinja_env.get_template(template_path.name)
+        print(template.render(**render_args))
