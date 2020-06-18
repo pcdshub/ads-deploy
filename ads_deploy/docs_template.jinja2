@@ -39,7 +39,7 @@
 {% for nc in tsproj.nc %}
 .. csv-table::
     :header: Axis ID, Name
-    :align: left
+    :align: center
 
     {% for axis_id, axis in nc.axis_by_id | dictsort %}
         {{ axis_id }}, {{ axis.name }}
@@ -82,7 +82,7 @@ Axis {{ axis_id }}: {{ axis.name }}
 .. raw:: html
 
    <details>
-
+        <summary>{{ tsproj.links|length}} Links</summary>
 .. csv-table::
     :header: Owner A, Item A, Owner B, Item B
     :align: center
@@ -160,22 +160,33 @@ Total linter errors: {{ plc.pragma_errors }}
 
 {{ subsection("Symbols") }}
 
+
+{% for group, symbols in plc.symbols | groupby(attribute="top_level_group") %}
+
+    {{- subsubsection(group) }}
+
+{% if symbols|length > 2 %}
 .. raw:: html
 
    <details>
+       <summary>{{symbols|length}} Symbols</summary>
 
+{% endif %}
 .. csv-table::
-    :header: Symbol, Type, Offset, Size, Pointer
+    :header: Symbol, Type, Offset/Size
     :align: center
 
-    {% for symbol in plc.symbols | sort(attribute="name") %}
-        {{ symbol.name }}, {{ symbol.qualified_type_name }}, {{ symbol.BitOffs[0].text }}, {{ symbol.BitSize[0].text }}, {{ symbol.is_pointer }}
-    {% endfor %}{# for link... #}
+    {% for symbol in symbols | sort(attribute="name") %}
+        {{ symbol.name }}, {{ symbol.summary_type_name }}, {{ symbol.BitOffs[0].text }} ({{ symbol.BitSize[0].text }})
+    {% endfor %}{# for symbol... #}
 
+{% if symbols|length > 2 %}
 .. raw:: html
 
    </details>
 
+{% endif %}
+{% endfor %}{# for group... #}
 
 {% endfor %}{# for plc in tsproj.plcs #}
 {% endfor %}{# for tsproj in tsprojects #}

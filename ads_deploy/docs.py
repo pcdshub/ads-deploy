@@ -136,12 +136,19 @@ def build_template_kwargs(solution_path, projects, plcs=None):
                 logger.debug('Skipping; not in valid list: %s', plcs)
                 continue
 
+            symbols = list(plc_project.find(pytmc_parser.Symbol))
+
+            for symbol in symbols:
+                symbol.top_level_group = (
+                    symbol.name.split('.')[0] if symbol.name else 'Unknown')
+
             plc_info = dict(
                 name=plc_name,
                 obj=plc_project,
                 tmc_path=plc_project.tmc_path,
-                symbols=list(plc_project.find(pytmc_parser.Symbol)),
+                symbols=symbols,
             )
+
             proj_info['plcs'].append(plc_info)
 
             plc_info.update(**lint_plc(plc_project))
