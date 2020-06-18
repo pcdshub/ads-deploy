@@ -3,7 +3,7 @@ SET DockerImage=pcdshub/ads-deploy:latest
 REM The default, which can be overridden in `select_conda_or_docker.cmd`
 SET AdsDeployUseDocker=1
 
-SET DeployRoot=%~dp0%..\
+SET DeployRoot=%~dp0%..\..\
 
 SET SolutionDir=%1
 SET SolutionFilename=%2
@@ -50,8 +50,8 @@ SET RunDocker=docker run ^
 	-e DISPLAY=host.docker.internal:0.0 ^
     -i
 
-CALL %DeployRoot%\windows\conda_config.cmd
-CALL %DeployRoot%\windows\select_conda_or_docker.cmd
+CALL %DeployRoot%\ads_deploy\windows\conda_config.cmd
+CALL %DeployRoot%\ads_deploy\windows\select_conda_or_docker.cmd
 
 if not [%AdsDeployConfigured%] == [1] (
     IF %AdsDeployUseDocker% EQU 1 (

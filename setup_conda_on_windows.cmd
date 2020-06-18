@@ -7,7 +7,7 @@ echo * Checking conda is installed...
 call conda --version
 
 IF %ERRORLEVEL% NEQ 0 (
-    echo !! Conda not installed correctly.  Please install conda 3.7 from: 
+    echo !! Conda not installed correctly.  Please install conda 3.7 from:
     echo https://docs.conda.io/en/latest/miniconda.html#windows-installers
     GOTO :Failed
 )
@@ -15,7 +15,7 @@ IF %ERRORLEVEL% NEQ 0 (
 call conda deactivate
 
 REM Source conda configuration env
-CALL %~dp0\windows\conda_config.cmd
+CALL %~dp0\ads_deploy\windows\conda_config.cmd
 
 echo.
 echo * Creating the environment %ADS_DEPLOY_CONDA_ENV%...
