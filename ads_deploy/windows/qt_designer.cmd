@@ -3,7 +3,13 @@
 
 @echo Running Qt designer...
 pushd %SolutionDir%
-%RunDocker% %DockerImage% "source activate && designer; sleep 1"
+IF %AdsDeployUseDocker% EQU 1 (
+    %RunDocker% %DockerImage% "source activate && designer; sleep 1"
+) ELSE (
+    start designer
+    echo It may take a while for designer to show.
+    pause
+)
 @popd
 
 @echo Done
