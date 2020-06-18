@@ -14,7 +14,7 @@ conda deactivate
 echo ""
 echo "* Creating the environment $ADS_DEPLOY_CONDA_ENV..."
 
-conda create -y --name $ADS_DEPLOY_CONDA_ENV --override-channels --channel conda-forge --channel defaults --file pytmc_env.yml
+conda create -y --name $ADS_DEPLOY_CONDA_ENV --override-channels --channel conda-forge --channel defaults --file conda_env_base.yml
 
 if [ $? -ne 0 ]; then
     echo "Failed to create the ads-deploy conda environment."

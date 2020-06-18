@@ -16,11 +16,11 @@ RUN yum -y update \
     && conda clean --all --yes \
     && yum clean all
 
-ADD pytmc_env.yml pytmc_env.yml
+ADD conda_env_base.yml conda_env_base.yml
 
 RUN pip install --upgrade pip
 RUN conda config --add channels conda-forge
-RUN conda install --channel conda-forge --file pytmc_env.yml
+RUN conda install --channel conda-forge --file conda_env_base.yml
 
 RUN pip install pyads==3.2.1
 

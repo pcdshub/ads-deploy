@@ -3,7 +3,11 @@
 
 @echo Creating windows_run-ioc-in-docker.cmd and windows_run-typhos-gui.cmd...
 
-%RunDocker% %DockerImage% "find '%IocMountPath%/iocBoot/' -maxdepth 1 -type d ! -path '%IocMountPath%/iocBoot/' -exec python /ads-deploy/ads_deploy/windows/make_scripts.py {} '%DeployRoot%' '%SolutionDir%' '%SolutionFilename%' '%IocMountPath%' '%DockerImage%' \;"
+IF %AdsDeployUseDocker% EQU 1 (
+    %RunDocker% %DockerImage% "find '%IocMountPath%/iocBoot/' -maxdepth 1 -type d ! -path '%IocMountPath%/iocBoot/' -exec python /ads-deploy/ads_deploy/windows/make_scripts.py {} '%DeployRoot%' '%SolutionDir%' '%SolutionFilename%' '%IocMountPath%' '%DockerImage%' \;"
+) ELSE (
+    goto :Fail
+)
 
 @echo Done
 @GOTO :eof

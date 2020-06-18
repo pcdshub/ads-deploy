@@ -13,6 +13,7 @@ IF %AdsDeployUseDocker% EQU 1 (
     %RunDocker% %DockerImage% "find '%IocMountPath%/iocBoot' -type d -maxdepth 1 -name 'ioc*' -exec make -C {} \;"
 ) ELSE (
     echo ** Conda TODO build
+    goto :Fail
 )
 
 if %ERRORLEVEL% NEQ 0 (

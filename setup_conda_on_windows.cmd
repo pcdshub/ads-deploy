@@ -19,12 +19,14 @@ CALL %~dp0\ads_deploy\windows\conda_config.cmd
 
 echo.
 echo * Creating the environment %ADS_DEPLOY_CONDA_ENV%...
-call conda create -y --name %ADS_DEPLOY_CONDA_ENV% --override-channels --channel conda-forge --channel defaults --file pytmc_env.yml
+call conda create -y --name %ADS_DEPLOY_CONDA_ENV% --override-channels --channel conda-forge --channel defaults --file conda_env_base.yml
 
 IF %ERRORLEVEL% NEQ 0 (
     setlocal FAIL_REASON=Failed to create the ads-deploy conda environment.
     GOTO :ConfigureFailure
 )
+
+call conda install --name %ADS_DEPLOY_CONDA_ENV% --override-channels --channel conda-forge --channel defaults --file conda_env_windows_extras.yml
 
 echo.
 echo * Changing to the new conda environment...
