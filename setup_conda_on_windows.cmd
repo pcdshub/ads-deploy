@@ -26,7 +26,7 @@ IF %ERRORLEVEL% NEQ 0 (
     GOTO :ConfigureFailure
 )
 
-call conda install --name %ADS_DEPLOY_CONDA_ENV% --override-channels --channel conda-forge --channel defaults --file conda_env_windows_extras.yml
+call conda install -y --name %ADS_DEPLOY_CONDA_ENV% --override-channels --channel conda-forge --channel defaults --file conda_env_windows_extras.yml
 
 echo.
 echo * Changing to the new conda environment...
@@ -51,12 +51,14 @@ IF %ERRORLEVEL% NEQ 0 (
 
 echo.
 echo * Enabling conda in git-bash...
-bash -c 'conda init bash'
+bash --login -c 'conda init bash'
 
 IF %ERRORLEVEL% NEQ 0 (
     setlocal FAIL_REASON=Failed to configure git-bash
     GOTO :ConfigureFailure
 )
+
+bash --login -c "git clone https://github.com/pcdshub/ads-ioc/ '%WINDOWS_ADS_IOC_TOP%' || (cd '%WINDOWS_ADS_IOC_TOP%' && git pull origin master)"
 
 :Success
 echo.
