@@ -1,1 +1,1 @@
-SET AdsDeployUseDocker=0 
+SET AdsDeployUseDocker=1 
