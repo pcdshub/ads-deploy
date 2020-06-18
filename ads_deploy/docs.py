@@ -136,7 +136,7 @@ def build_template_kwargs(solution_path, projects, plcs=None):
                 logger.debug('Skipping; not in valid list: %s', plcs)
                 continue
 
-            symbols = list(plc_project.find(pytmc_parser.Symbol))
+            symbols = set(plc_project.find(pytmc_parser.Symbol))
 
             for symbol in symbols:
                 symbol.top_level_group = (
