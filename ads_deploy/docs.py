@@ -105,6 +105,43 @@ def get_jinja_environment(templates):
     return jinja_env
 
 
+if 'Entry' not in pytmc_parser.TWINCAT_TYPES:
+    class Entry(pytmc_parser.TwincatItem):
+        @property
+        def entry_type(self):
+            return getattr(self, 'Type', [None])[0]
+
+        @property
+        def comment(self):
+            return self.Comment[0].text if hasattr(self, 'Comment') else ''
+
+    class EtherCAT(pytmc_parser.TwincatItem):
+        ...
+
+    class Pdo(pytmc_parser.TwincatItem):
+        ...
+
+    pytmc_parser.Entry = Entry
+    pytmc_parser.Pdo = Pdo
+    pytmc_parser.EtherCAT = EtherCAT
+
+
+def get_boxes(tsproj):
+    return {
+        int(box.attributes['Id']): box
+        for box in tsproj.find(pytmc_parser.Box)
+    }
+
+
+def get_symbols(plc_project):
+    symbols = set(plc_project.find(pytmc_parser.Symbol))
+
+    for symbol in symbols:
+        symbol.top_level_group = (
+            symbol.name.split('.')[0] if symbol.name else 'Unknown')
+    return symbols
+
+
 def build_template_kwargs(solution_path, projects, plcs=None):
     render_args = {
         'solution': solution_path,
@@ -121,10 +158,7 @@ def build_template_kwargs(solution_path, projects, plcs=None):
             plcs=[],
             obj=parsed_tsproj,
             nc=list(parsed_tsproj.find(pytmc_parser.NC)),
-            box_by_id={
-                int(box.attributes['Id']): box
-                for box in parsed_tsproj.find(pytmc_parser.Box)
-            },
+            box_by_id=get_boxes(parsed_tsproj),
             links=list(parsed_tsproj.find(pytmc_parser.Link)),
         )
 
@@ -136,17 +170,11 @@ def build_template_kwargs(solution_path, projects, plcs=None):
                 logger.debug('Skipping; not in valid list: %s', plcs)
                 continue
 
-            symbols = set(plc_project.find(pytmc_parser.Symbol))
-
-            for symbol in symbols:
-                symbol.top_level_group = (
-                    symbol.name.split('.')[0] if symbol.name else 'Unknown')
-
             plc_info = dict(
                 name=plc_name,
                 obj=plc_project,
                 tmc_path=plc_project.tmc_path,
-                symbols=symbols,
+                symbols=get_symbols(plc_project),
             )
 
             proj_info['plcs'].append(plc_info)
