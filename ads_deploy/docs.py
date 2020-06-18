@@ -121,7 +121,10 @@ def build_template_kwargs(solution_path, projects, plcs=None):
             plcs=[],
             obj=parsed_tsproj,
             nc=list(parsed_tsproj.find(pytmc_parser.NC)),
-            boxes=list(parsed_tsproj.find(pytmc_parser.Box)),
+            box_by_id={
+                int(box.attributes['Id']): box
+                for box in parsed_tsproj.find(pytmc_parser.Box)
+            },
             links=list(parsed_tsproj.find(pytmc_parser.Link)),
         )
 

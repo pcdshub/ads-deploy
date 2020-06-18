@@ -67,6 +67,35 @@ Axis {{ axis_id }}: {{ axis.name }}
 
 {% endfor %}{# for nc... #}
 
+{{ section("Boxes") }}
+
+.. csv-table::
+    :header: Box ID, Name
+    :align: center
+
+    {% for box_id, box in tsproj.box_by_id | dictsort %}
+        {{ box_id }}, {{ box.name }}
+    {% endfor %}{# for box... #}
+
+{{ section("Links") }}
+
+.. raw:: html
+
+   <details>
+
+.. csv-table::
+    :header: Owner A, Item A, Owner B, Item B
+    :align: center
+
+    {% for link in tsproj.links | sort(attribute="a") %}
+        {{ link.a[0] }}, {{ link.a[1] }}, {{ link.b[0] }}, {{ link.b[1] }}
+    {% endfor %}{# for link... #}
+
+.. raw:: html
+
+   </details>
+
+
 {% for plc in tsproj.plcs %}
 {{ section(plc.name) }}
 
@@ -128,6 +157,25 @@ Total linter errors: {{ plc.pragma_errors }}
 
 {% endfor %}{# for dut_name, ... #}
 {% endfor %}{# for source_dict ... #}
+
+{{ subsection("Symbols") }}
+
+.. raw:: html
+
+   <details>
+
+.. csv-table::
+    :header: Symbol, Type, Offset, Size, Pointer
+    :align: center
+
+    {% for symbol in plc.symbols | sort(attribute="name") %}
+        {{ symbol.name }}, {{ symbol.qualified_type_name }}, {{ symbol.BitOffs[0].text }}, {{ symbol.BitSize[0].text }}, {{ symbol.is_pointer }}
+    {% endfor %}{# for link... #}
+
+.. raw:: html
+
+   </details>
+
 
 {% endfor %}{# for plc in tsproj.plcs #}
 {% endfor %}{# for tsproj in tsprojects #}
