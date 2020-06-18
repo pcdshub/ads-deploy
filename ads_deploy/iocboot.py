@@ -8,6 +8,7 @@ import getpass
 import logging
 import os
 import pathlib
+import sys
 
 import jinja2
 import pytmc
@@ -135,14 +136,19 @@ def create_iocboot_for_plc(tsproj_project, plc, *, ioc_name, makefile_path,
     output_makefile = destination / 'Makefile'
 
     plc_path = pathlib.Path(plc.filename)
+
+    def relative_path(path, start):
+        path = os.path.relpath(path, start)
+        return path if sys.platform != 'win32' else path.replace(os.sep, '/')
+
     template_args = dict(
         project_name=tsproj_project.stem,
         plc_name=plc.name,
-        tsproj_path=os.path.relpath(tsproj_project, destination),
-        plc_path=os.path.relpath(plc_path, destination),
-        project_path=os.path.relpath(tsproj_project.parent, destination),
+        tsproj_path=relative_path(tsproj_project, destination),
+        plc_path=relative_path(plc_path, destination),
+        project_path=relative_path(tsproj_project.parent, destination),
         template_path=ioc_template_path,
-        plcproj=os.path.relpath(plc.filename, destination),
+        plcproj=relative_path(plc.filename, destination),
         plc_ams_id=plc.ams_id,
         plc_ip=plc.target_ip,
         plc_ads_port=plc.port,

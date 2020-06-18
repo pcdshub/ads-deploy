@@ -49,6 +49,15 @@ IF %ERRORLEVEL% NEQ 0 (
     GOTO :ConfigureFailure
 )
 
+echo.
+echo * Enabling conda in git-bash...
+bash -c 'conda init bash'
+
+IF %ERRORLEVEL% NEQ 0 (
+    setlocal FAIL_REASON=Failed to configure git-bash
+    GOTO :ConfigureFailure
+)
+
 :Success
 echo.
 echo Success.
