@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "* Checking conda is installed..."
-if [ ! command -v conda ]; then
+if ! command -v conda; then
     echo "!! Conda not found.  Check your environment or install conda 3.7 from:"
     echo "https://docs.conda.io/en/latest/miniconda.html"
     exit 1
@@ -9,7 +9,7 @@ fi
 
 conda deactivate
 
-. tools/conda_config.sh
+. ads_deploy/windows/conda_config.sh
 
 echo ""
 echo "* Creating the environment $ADS_DEPLOY_CONDA_ENV..."
