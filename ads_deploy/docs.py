@@ -18,14 +18,18 @@ import pathlib
 
 import jinja2
 import pytmc
+import pytmc.bin.db
 import pytmc.bin.pragmalint
 from pytmc import parser as pytmc_parser
 
 from . import util
 
+# from . import templates as templates_module
+
 DESCRIPTION = __doc__
 MODULE_PATH = pathlib.Path(__file__).parent
-DEFAULT_TEMPLATES = [MODULE_PATH / 'docs_template.jinja2']
+TEMPLATE_PATH = MODULE_PATH / 'templates'
+DEFAULT_TEMPLATES = list(TEMPLATE_PATH.glob('*.rst'))
 logger = logging.getLogger(__name__)
 
 
@@ -58,8 +62,23 @@ def build_arg_parser(parser=None):
     )
 
     parser.add_argument(
+        '--dbd',
+        '-d',
+        default=None,
+        type=str,
+        help='Specify an expanded .dbd file for validating record fields'
+    )
+
+    parser.add_argument(
+        '--dry-run',
+        action='store_true',
+        help='Dry-run only - do not write files'
+    )
+
+    parser.add_argument(
         '--output',
         dest='output_path',
+        default='.',
         type=str,
         help='Write documentation to this location'
     )
@@ -87,9 +106,8 @@ def lint_plc(plc_project):
 def get_jinja_environment(templates):
     template_dirs = set(str(item.parent) for item in templates)
 
-    loader = jinja2.ChoiceLoader(
-        [jinja2.FileSystemLoader(str(path)) for path in template_dirs]
-    )
+    loader = jinja2.ChoiceLoader([jinja2.FileSystemLoader(str(path))
+                                  for path in template_dirs])
 
     jinja_env = jinja2.Environment(
         loader=loader,
@@ -103,6 +121,17 @@ def get_jinja_environment(templates):
 
     jinja_env.filters['title_fill'] = title_fill
     return jinja_env
+
+
+def get_jinja_filename_environment(templates):
+    loader = jinja2.DictLoader({template.name: template.name
+                                for template in templates})
+
+    return jinja2.Environment(
+        loader=loader,
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
 
 
 if 'Entry' not in pytmc_parser.TWINCAT_TYPES:
@@ -142,7 +171,23 @@ def get_symbols(plc_project):
     return symbols
 
 
-def build_template_kwargs(solution_path, projects, plcs=None):
+def get_plc_records(plc_project, dbd):
+    if plc_project.tmc is None:
+        return None, None
+
+    try:
+        return pytmc.bin.db.process(
+            plc_project.tmc, dbd_file=dbd, allow_errors=True,
+            show_error_context=True,
+        )
+    except Exception:
+        logger.exception(
+            'Failed to create EPICS records'
+        )
+        return None, None
+
+
+def build_template_kwargs(solution_path, projects, *, plcs=None, dbd=None):
     render_args = {
         'solution': solution_path,
         'solution_name': solution_path.name if solution_path else None,
@@ -154,6 +199,7 @@ def build_template_kwargs(solution_path, projects, plcs=None):
 
         proj_info = dict(
             directory=tsproj_project.parent,
+            name=tsproj_project.stem,
             filename=tsproj_project.name,
             plcs=[],
             obj=parsed_tsproj,
@@ -170,11 +216,14 @@ def build_template_kwargs(solution_path, projects, plcs=None):
                 logger.debug('Skipping; not in valid list: %s', plcs)
                 continue
 
+            records, record_exceptions = get_plc_records(plc_project, dbd)
             plc_info = dict(
                 name=plc_name,
                 obj=plc_project,
                 tmc_path=plc_project.tmc_path,
                 symbols=get_symbols(plc_project),
+                records=records,
+                record_exceptions=record_exceptions,
             )
 
             proj_info['plcs'].append(plc_info)
@@ -184,18 +233,64 @@ def build_template_kwargs(solution_path, projects, plcs=None):
     return render_args
 
 
-def main(project, plcs=None, templates=None, output_path=None):
-    if templates is not None:
-        templates = [pathlib.Path(item) for item in templates]
-    else:
-        templates = DEFAULT_TEMPLATES
+def main(project, output_path, *, plcs=None, templates=None, dbd=None,
+         dry_run=False):
+    templates = [
+        pathlib.Path(item)
+        for item in (templates or DEFAULT_TEMPLATES)
+    ]
+
+    if not templates:
+        raise ValueError('No templates provided.')
 
     jinja_env = get_jinja_environment(templates)
+    jinja_filename_env = get_jinja_filename_environment(templates)
+
+    output_path = pathlib.Path(output_path)
+
+    if not output_path.is_dir():
+        raise ValueError(f'Output path is not a directory: {output_path}')
 
     solution_path, projects = util.get_tsprojects_from_filename(project.name)
 
-    render_args = build_template_kwargs(solution_path, projects, plcs=plcs)
+    full_render_args = build_template_kwargs(
+        solution_path, projects, plcs=plcs, dbd=dbd)
 
-    for template_path in templates:
+    def write_file(template_path, render_args, template_type=''):
+        target_filename = jinja_filename_env.get_template(
+            template_path.name).render(**render_args)
+
+        logger.info('Rendering %s template: %s -> %s',
+                    template_type,
+                    template_path.name,
+                    target_filename)
+
         template = jinja_env.get_template(template_path.name)
-        print(template.render(**render_args))
+        contents = template.render(**render_args)
+        if dry_run:
+            print('** dry run ** file:', target_filename)
+            print(contents)
+        else:
+            with open(output_path / target_filename, 'wt') as f:
+                f.write(contents)
+
+    logger.debug('All templates: %s', templates)
+    for template_path in templates:
+        if '{plc' in template_path.name.replace(' ', ''):
+            # A bit of hacking: generate template per PLC
+            for tsproj in full_render_args['tsprojects']:
+                for plc in tsproj['plcs']:
+                    render_args = dict(full_render_args)
+                    render_args['tsproj'] = tsproj
+                    render_args['plc'] = plc
+                    write_file(template_path, render_args, 'per-PLC')
+        elif '{tsproj' in template_path.name.replace(' ', ''):
+            # A bit of hacking: generate template per tsproj
+            for tsproj in full_render_args['tsprojects']:
+                render_args = dict(full_render_args)
+                render_args['tsproj'] = tsproj
+                write_file(template_path, render_args, 'per-tsproj')
+        else:
+            write_file(template_path, full_render_args, 'general')
+
+    logger.info('Done')

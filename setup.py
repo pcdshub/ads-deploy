@@ -1,7 +1,9 @@
-import versioneer
-from os import path
-from setuptools import setup, find_packages
 import sys
+from os import path
+
+from setuptools import find_packages, setup
+
+import versioneer
 
 min_version = (3, 6)
 
@@ -52,11 +54,9 @@ setup(
     entry_points={'console_scripts': ['ads-deploy=ads_deploy.__main__:main']},
     include_package_data=True,
     package_data={
-        'ads-deploy': [
-            # When adding files here, remember to update MANIFEST.in as well,
-            # or else they will not be included in the distribution on PyPI!
-            # 'path/to/data_file',
-            ]
+        'ads_deploy': ['templates/*.jinja2',
+                       'templates/*.macro',
+                       ]
         },
     install_requires=requirements,
     classifiers=[

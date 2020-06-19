@@ -11,4 +11,5 @@ recursive-include *.xml *.cmd
 include ads_deploy/_version.py
 
 include versioneer.py
-include ads_deploy/*.jinja2
+include ads_deploy/templates/*.rst
+include ads_deploy/templates/*.macro
