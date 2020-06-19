@@ -1,0 +1,4 @@
+ads-deploy/_version.py export-subst
+st.cmd            text eol=lf
+tools/*.cmd       text eol=crlf
+ads_deploy/_version.py export-subst

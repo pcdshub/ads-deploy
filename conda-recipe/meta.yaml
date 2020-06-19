@@ -1,0 +1,43 @@
+{% set data = load_setup_py_data() %}
+
+package:
+  name: ads-deploy
+  version : {{ data.get('version') }}
+
+source:
+  path: ..
+
+build:
+  noarch: python
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv"
+  entry_points:
+    - ads-deploy = ads_deploy.__main__:main
+
+requirements:
+  host:
+    - python >=3.6
+    - pip
+  run:
+    - python >=3.6
+    - pytmc >=2.6.5
+    - typhos >=1.0
+
+test:
+  imports:
+    - ads_deploy
+  requires:
+    - pytest
+
+about:
+  home: https://github.com/pcdshub/ads-deploy
+  license: SLAC Open
+  license_family: Other
+  license_file: LICENSE
+  summary: 'TwinCAT ADS EPICS IOC deployment tools'
+
+extra:
+  recipe-maintainers:
+    - klauer
+    - zllentz
+    - n-wbrown

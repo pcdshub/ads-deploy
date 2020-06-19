@@ -1,0 +1,16 @@
+{%- macro chapter(title) %}
+{{ title | title_fill("=") }}
+{{ title }}
+{{ title | title_fill("=") }}{% endmacro -%}
+
+{%- macro section(title) %}
+{{ title }}
+{{ title | title_fill("-") }}{% endmacro -%}
+
+{%- macro subsection(title) %}
+{{ title }}
+{{ title | title_fill("^") }}{% endmacro -%}
+
+{%- macro subsubsection(title) %}
+{{ title }}
+{{ title | title_fill('"') }}{% endmacro -%}

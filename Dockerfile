@@ -16,13 +16,13 @@ RUN yum -y update \
     && conda clean --all --yes \
     && yum clean all
 
-ADD pytmc_env.yml pytmc_env.yml
+ADD conda_env_base.yml conda_env_base.yml
 
 RUN pip install --upgrade pip
 RUN conda config --add channels conda-forge
-RUN conda install --channel conda-forge --file pytmc_env.yml
+RUN conda install --channel conda-forge --file conda_env_base.yml
 
-RUN pip install pytmc==2.6.5 pyads==3.2.1
+RUN pip install pyads==3.2.1
 
 ENV ADS_IOC_ROOT       /reg/g/pcds/epics/ioc/common/ads-ioc
 ENV ADS_IOC_VERSION    R0.2.4
