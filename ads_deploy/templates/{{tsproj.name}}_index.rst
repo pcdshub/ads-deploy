@@ -5,11 +5,11 @@
 .. toctree::
     :maxdepth: 2
     :caption: Contents:
-    :glob:
 
     {{ tsproj.name }}_summary
 {% for plc in tsproj.plcs %}
     {{ tsproj.name }}_{{ plc.name }}_summary
+    {{ tsproj.name }}_{{ plc.name }}_epics
     {{ tsproj.name }}_{{ plc.name }}_source
 {% endfor %}
 

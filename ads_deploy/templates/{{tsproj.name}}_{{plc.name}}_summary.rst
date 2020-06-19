@@ -1,6 +1,6 @@
 {% import "util.macro" as util %}
 
-{% set section_name %}{{ tsproj.name }} {{ plc.name }} Summary{% endset %}
+{% set section_name %}{{ plc.name }}{% endset %}
 {{ util.section(section_name) }}
 
 {{ util.subsection('Settings') }}

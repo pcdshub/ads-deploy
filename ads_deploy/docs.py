@@ -103,6 +103,35 @@ def lint_plc(plc_project):
             'linter_results': results}
 
 
+def config_to_pragma(config, skip_desc=True, skip_pv=True):
+    if not config:
+        return
+
+    for key, value in config.items():
+        if key == 'archive':
+            seconds = value.get('seconds', 'unknown')
+            method = value.get('method', 'unknown')
+            fields = value.get('fields', {'VAL'})
+            if seconds != 1 or method != 'scan':
+                yield ('archive', f'{seconds}s {method}')
+            if fields != {'VAL'}:
+                yield ('archive_fields', ' '.join(fields))
+        elif key == 'update':
+            frequency = value.get('frequency', 1)
+            method = value.get('method', 'unknown')
+            if frequency != 1 or method != 'poll':
+                yield (key, f'{frequency}hz {method}')
+        elif key == 'field':
+            for field, value in value.items():
+                if field != 'DESC' or not skip_desc:
+                    yield ('field', f'{field} {value}')
+        elif key == 'pv':
+            if not skip_pv:
+                yield (key, ':'.join(value))
+        else:
+            yield (key, value)
+
+
 def get_jinja_environment(templates):
     template_dirs = set(str(item.parent) for item in templates)
 
@@ -119,6 +148,7 @@ def get_jinja_environment(templates):
     def title_fill(eval_ctx, text, fill_char):
         return fill_char * len(text)
 
+    jinja_env.globals['config_to_pragma'] = config_to_pragma
     jinja_env.filters['title_fill'] = title_fill
     return jinja_env
 
@@ -176,7 +206,7 @@ def get_plc_records(plc_project, dbd):
         return None, None
 
     try:
-        return pytmc.bin.db.process(
+        packages, exceptions = pytmc.bin.db.process(
             plc_project.tmc, dbd_file=dbd, allow_errors=True,
             show_error_context=True,
         )
@@ -185,6 +215,14 @@ def get_plc_records(plc_project, dbd):
             'Failed to create EPICS records'
         )
         return None, None
+
+    records = []
+    for package in packages:
+        for record in package.records:
+            record._ads_deploy_record_package_ = package
+            records.append(record)
+
+    return records, exceptions
 
 
 def build_template_kwargs(solution_path, projects, *, plcs=None, dbd=None):
@@ -226,6 +264,8 @@ def build_template_kwargs(solution_path, projects, *, plcs=None, dbd=None):
                 record_exceptions=record_exceptions,
             )
 
+            logger.debug('Records for %s: %d', plc_name,
+                         len(records) if records else 0)
             proj_info['plcs'].append(plc_info)
 
             plc_info.update(**lint_plc(plc_project))

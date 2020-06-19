@@ -1,6 +1,6 @@
 {% import "util.macro" as util %}
 
-{% set sectionname %}{{tsproj.filename}} Summary{% endset %}
+{% set sectionname %}Summary{% endset %}
 {{ util.section(sectionname) }}
 
 {{ util.subsection("Pragma Summary") }}
