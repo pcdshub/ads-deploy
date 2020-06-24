@@ -17,9 +17,11 @@ import logging
 import pathlib
 
 import jinja2
+
 import pytmc
 import pytmc.bin.db
 import pytmc.bin.pragmalint
+import pytmc.bin.summary
 from pytmc import parser as pytmc_parser
 
 from . import util
@@ -216,19 +218,21 @@ def get_plc_records(plc_project, dbd):
         )
         return None, None
 
-    records = []
-    for package in packages:
-        for record in package.records:
-            record._ads_deploy_record_package_ = package
-            records.append(record)
+    records = [
+        record
+        for package in packages
+        for record in package.records
+    ]
 
     return records, exceptions
 
 
 def build_template_kwargs(solution_path, projects, *, plcs=None, dbd=None):
+    solution_name = solution_path.stem if solution_path is not None else None
+    print('solution name is', solution_name, solution_path)
     render_args = {
         'solution': solution_path,
-        'solution_name': solution_path.name if solution_path else None,
+        'solution_name': solution_name,
         'tsprojects': [],
     }
 
@@ -255,11 +259,20 @@ def build_template_kwargs(solution_path, projects, *, plcs=None, dbd=None):
                 continue
 
             records, record_exceptions = get_plc_records(plc_project, dbd)
+            data_types = []
+            try:
+                if plc_project.tmc is not None:
+                    data_types = pytmc.bin.summary.enumerate_types(
+                        plc_project.tmc)
+            except Exception:
+                logger.exception('Failed to get data type information')
+
             plc_info = dict(
                 name=plc_name,
                 obj=plc_project,
                 tmc_path=plc_project.tmc_path,
                 symbols=get_symbols(plc_project),
+                data_types=data_types,
                 records=records,
                 record_exceptions=record_exceptions,
             )

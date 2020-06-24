@@ -75,7 +75,7 @@ def get_tsprojects_from_filename(filename):
     projects : list
         List of tsproj projects.
     """
-    filename = pathlib.Path(filename)
+    filename = pathlib.Path(filename).resolve()
     if filename.suffix == '.tsproj':
         return filename.parent, [filename]
     if filename.suffix == '.sln':
