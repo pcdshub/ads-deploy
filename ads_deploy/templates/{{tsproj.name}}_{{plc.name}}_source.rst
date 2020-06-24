@@ -1,14 +1,12 @@
 {% import "util.macro" as util %}
 
-{% set section_name %}{{plc.name}} Source Code{% endset %}
-{{ util.section(section_name) }}
+{% for section, source_dict in [('DUTs', plc.obj.dut_by_name), ('GVLs', plc.obj.gvl_by_name), ('POUs', plc.obj.pou_by_name)] %}
 
-{% for source_dict in [plc.obj.dut_by_name, plc.obj.gvl_by_name, plc.obj.pou_by_name] %}
+{{ util.section(section) }}
 
 {% for source_name, source in source_dict | dictsort %}
 
-{% set header = source.tag + ': ' + source_name %}
-{{ util.subsection(header) }}
+{{ util.subsection(source_name) }}
 
 ::
 

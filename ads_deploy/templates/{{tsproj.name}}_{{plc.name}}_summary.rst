@@ -1,9 +1,6 @@
 {% import "util.macro" as util %}
 
-{% set section_name %}{{ plc.name }}{% endset %}
-{{ util.section(section_name) }}
-
-{{ util.subsection('Settings') }}
+{{ util.section('Settings') }}
 
 .. list-table::
     :header-rows: 1
@@ -24,13 +21,13 @@
 
 .. _{{ plc.name }}_pragmas:
 
-{{ util.subsection('Pragmas') }}
+{{ util.section('Pragmas') }}
 
 Total pragmas found: {{ plc.pragma_count }}
 Total linter errors: {{ plc.pragma_errors }}
 
         {% for filename, items in plc.linter_results | groupby('filename') %}
-            {{- util.subsubsection(filename) }}
+            {{- util.subsection(filename) }}
 
             {% for item in items %}
 #. Line {{ item.line_number }} ({{ item.exception.__class__.__name__ }})
@@ -46,14 +43,14 @@ Total linter errors: {{ plc.pragma_errors }}
             {% endfor %}{# for item in items #}
         {% endfor %}{# for ... in plc.linter_results #}
 
-{{ util.subsection("Symbols") }}
+{{ util.section("Symbols") }}
 
 
 {% for group, symbols in plc.symbols | groupby(attribute="top_level_group") %}
 
-    {{- util.subsubsection(group) }}
+    {{- util.subsection(group) }}
 
-{% if symbols|length > 2 %}
+{% if symbols|length > 10 %}
 .. raw:: html
 
    <details>
@@ -68,10 +65,12 @@ Total linter errors: {{ plc.pragma_errors }}
         {{ symbol.name }}, {{ symbol.summary_type_name }}, {{ symbol.BitOffs[0].text }} ({{ symbol.BitSize[0].text }})
     {% endfor %}{# for symbol... #}
 
-{% if symbols|length > 2 %}
+{% if symbols|length > 10 %}
 .. raw:: html
 
    </details>
+   <br />
 
 {% endif %}
+
 {% endfor %}{# for group... #}
