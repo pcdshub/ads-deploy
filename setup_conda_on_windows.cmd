@@ -58,7 +58,12 @@ IF %ERRORLEVEL% NEQ 0 (
     GOTO :ConfigureFailure
 )
 
-bash --login -c "git clone https://github.com/pcdshub/ads-ioc/ '%WINDOWS_ADS_IOC_TOP%' || (cd '%WINDOWS_ADS_IOC_TOP%' && git pull origin master)"
+bash -c "git clone https://github.com/pcdshub/ads-ioc/ '%WINDOWS_ADS_IOC_TOP%'/master || (cd '%WINDOWS_ADS_IOC_TOP%'/master && git pull origin master)"
+bash -c "git clone --single-branch --branch R0.2.4 '%WINDOWS_ADS_IOC_TOP%'/master '%WINDOWS_ADS_IOC_TOP%'/R0.2.4"
+
+REM NOTE: bash -c "mkdir -p /reg/g/pcds/epics/ioc/common/ads-ioc"
+REM these paths are possible, but eventually are broken by how make mangles
+REM paths during the build phase.
 
 :Success
 echo.

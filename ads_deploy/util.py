@@ -34,7 +34,9 @@ def get_latest_ads_ioc():
     def get_version(path):
         try:
             version = path.name.lstrip('Rv').replace('-', '.')
-            return tuple(distutils.version.LooseVersion(version).version)
+            version = tuple(distutils.version.LooseVersion(version).version)
+            if isinstance(version[0], int):
+                return version
         except Exception:
             ...
 

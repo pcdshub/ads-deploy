@@ -56,6 +56,8 @@ setup(
     package_data={
         'ads_deploy': ['templates/*.jinja2',
                        'templates/*.macro',
+                       'windows/*.cmd',
+                       'windows/*.sh',
                        ]
         },
     install_requires=requirements,
