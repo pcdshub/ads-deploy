@@ -12,9 +12,7 @@ IF %AdsDeployUseDocker% EQU 1 (
     @echo - Attempting to build the IOC
     %RunDocker% %DockerImage% "find '%IocMountPath%/iocBoot' -type d -maxdepth 1 -name 'ioc*' -exec make -C {} \;"
 ) ELSE (
-    FOR /F "tokens=*" %%F IN ('dir /b "%SolutionDir%\iocBoot\ioc*"') DO (
-        echo %Divider% && cd "%SolutionDir%\iocBoot\"%%F && echo * Building %%F  && bash --login -c "conda activate %ADS_DEPLOY_CONDA_ENV% && rm -rf .pytmc_build && make build clean"
-    )
+    bash --login -c "find '%SolutionDir:\=/%/iocBoot' -type d -maxdepth 1 -name 'ioc*' -exec bash --login %AdsDeployWindowsScripts:\=/%/build.sh '{}' '%WINDOWS_ADS_IOC_TOP:\=/%/' \;"
 )
 
 if %ERRORLEVEL% NEQ 0 (
