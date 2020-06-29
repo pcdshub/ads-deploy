@@ -173,7 +173,7 @@ def create_iocboot_for_plc(tsproj_project, plc, *, ioc_name, makefile_path,
     else:
         if output_makefile.exists() and not overwrite:
             raise RuntimeError('Must specify --overwrite to write over'
-                               ' existing Makefiles')
+                               ' existing Makefiles (or delete and try again)')
         with open(output_makefile, 'wt') as f:
             print(rendered, file=f)
 
@@ -255,6 +255,9 @@ def main(project, ioc_template_path, *, destination=None, prefix='ioc-',
             logger.debug('PLC: %s IOC name: %s IOC path: %s', plc_name,
                          ioc_name, ioc_path)
 
-            create_iocboot_for_plc(tsproj_project, plc_project,
-                                   ioc_name=ioc_name, destination=ioc_path,
-                                   **iocboot_settings)
+            try:
+                create_iocboot_for_plc(tsproj_project, plc_project,
+                                       ioc_name=ioc_name, destination=ioc_path,
+                                       **iocboot_settings)
+            except RuntimeError as ex:
+                logger.error('%s', ex)
