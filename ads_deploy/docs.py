@@ -260,9 +260,17 @@ def build_template_kwargs(solution_path, projects, *, plcs=None, dbd=None):
             records, record_exceptions = get_plc_records(plc_project, dbd)
             data_types = []
             try:
-                if plc_project.tmc is not None:
-                    data_types = pytmc.bin.summary.enumerate_types(
-                        plc_project.tmc)
+                # For now, combine project-level data types + tmc data types
+                proj_types = getattr(parsed_tsproj, 'DataTypes', [None])[0]
+                if proj_types is not None:
+                    data_types.extend(list(
+                        pytmc.bin.summary.enumerate_types(proj_types)
+                    ))
+
+                tmc = plc_project.tmc
+                if tmc is not None:
+                    data_types.extend(list(
+                        pytmc.bin.summary.enumerate_types(tmc)))
             except Exception:
                 logger.exception('Failed to get data type information')
 
