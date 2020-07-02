@@ -1,2 +1,3 @@
-pytmc
+pytmc>=2.6.6
+typhos>=1.0
 versioneer

@@ -20,7 +20,7 @@ requirements:
     - pip
   run:
     - python >=3.6
-    - pytmc >=2.6.5
+    - pytmc >=2.6.6
     - typhos >=1.0
 
 test:
