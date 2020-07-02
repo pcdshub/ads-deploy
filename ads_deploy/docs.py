@@ -229,7 +229,6 @@ def get_plc_records(plc_project, dbd):
 
 def build_template_kwargs(solution_path, projects, *, plcs=None, dbd=None):
     solution_name = solution_path.stem if solution_path is not None else None
-    print('solution name is', solution_name, solution_path)
     render_args = {
         'solution': solution_path,
         'solution_name': solution_name,
