@@ -227,6 +227,12 @@ def get_plc_records(plc_project, dbd):
     return records, exceptions
 
 
+def _clean_link(link):
+    link.a = tuple(value or '' for value in link.a)
+    link.b = tuple(value or '' for value in link.b)
+    return link
+
+
 def build_template_kwargs(solution_path, projects, *, plcs=None, dbd=None):
     solution_name = solution_path.stem if solution_path is not None else None
     render_args = {
@@ -246,7 +252,8 @@ def build_template_kwargs(solution_path, projects, *, plcs=None, dbd=None):
             obj=parsed_tsproj,
             nc=list(parsed_tsproj.find(pytmc_parser.NC)),
             box_by_id=get_boxes(parsed_tsproj),
-            links=list(parsed_tsproj.find(pytmc_parser.Link)),
+            links=[_clean_link(link) for link in
+                   parsed_tsproj.find(pytmc_parser.Link)],
         )
 
         render_args['tsprojects'].append(proj_info)
