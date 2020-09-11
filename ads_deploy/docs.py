@@ -241,11 +241,16 @@ def _build_library_versions(plc):
         library_name, version_and_vendor = text.split(', ')
         version, vendor = version_and_vendor.split('(')
         vendor = vendor.rstrip(')')
+        version = version.strip()
+
+        if version == '*':
+            version = 'Unset'
+
         return (
             library_name,
             {'name': library_name,
              'vendor': vendor,
-             version_key: version.strip(),
+             version_key: version,
              },
         )
 
