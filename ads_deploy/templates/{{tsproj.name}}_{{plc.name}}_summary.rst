@@ -43,6 +43,17 @@ Total linter errors: {{ plc.pragma_errors }}
             {% endfor %}{# for item in items #}
         {% endfor %}{# for ... in plc.linter_results #}
 
+
+{{ util.section('Libraries') }}
+
+.. csv-table::
+    :header: Library, Vendor, Default, Version
+    :align: center
+
+    {% for item in plc.libraries | sort(attribute="name") %}
+        {{ item.name }}, {{ item.vendor }}, {{ item.default }}, {{ item.version }}
+    {% endfor %}{# for library... #}
+
 {{ util.section("Symbols") }}
 
 
