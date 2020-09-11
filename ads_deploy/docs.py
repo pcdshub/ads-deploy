@@ -233,6 +233,45 @@ def _clean_link(link):
     return link
 
 
+def _build_library_versions(plc):
+    if 'DefaultResolution' not in pytmc_parser.TWINCAT_TYPES:
+        return []
+
+    def parse_library(text, version_key):
+        library_name, version_and_vendor = text.split(', ')
+        version, vendor = version_and_vendor.split('(')
+        vendor = vendor.rstrip(')')
+        version = version.strip()
+
+        if version == '*':
+            version = 'Unset'
+
+        return (
+            library_name,
+            {'name': library_name,
+             'vendor': vendor,
+             version_key: version,
+             },
+        )
+
+    libraries = dict(
+        parse_library(lib.text, version_key='default')
+        for lib in plc.find(pytmc_parser.TWINCAT_TYPES['DefaultResolution'])
+    )
+    resolved = dict(
+        parse_library(lib.text, version_key='version')
+        for lib in plc.find(pytmc_parser.TWINCAT_TYPES['Resolution'])
+    )
+
+    for name, info in resolved.items():
+        if name not in libraries:
+            libraries[name] = info
+        else:
+            libraries[name]['version'] = info['version']
+
+    return list(libraries.values())
+
+
 def build_template_kwargs(solution_path, projects, *, plcs=None, dbd=None):
     solution_name = solution_path.stem if solution_path is not None else None
     render_args = {
@@ -281,6 +320,12 @@ def build_template_kwargs(solution_path, projects, *, plcs=None, dbd=None):
             except Exception:
                 logger.exception('Failed to get data type information')
 
+            try:
+                libraries = _build_library_versions(plc_project)
+            except Exception:
+                logger.exception('Failed to aggregate library versions')
+                libraries = []
+
             plc_info = dict(
                 name=plc_name,
                 obj=plc_project,
@@ -289,6 +334,7 @@ def build_template_kwargs(solution_path, projects, *, plcs=None, dbd=None):
                 data_types=data_types,
                 records=records,
                 record_exceptions=record_exceptions,
+                libraries=libraries,
             )
 
             logger.debug('Records for %s: %d', plc_name,
