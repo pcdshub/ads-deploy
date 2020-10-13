@@ -38,7 +38,7 @@ Total linter errors: {{ plc.pragma_errors }}
 
     Full pragma:
 
-    {{ item.pragma | indent(4) }}
+    {{ item.pragma if item.pragma else '' | indent(4) }}
 
             {% endfor %}{# for item in items #}
         {% endfor %}{# for ... in plc.linter_results #}
