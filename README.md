@@ -18,6 +18,8 @@ Features
 Installation
 ============
 
+**Note: this is partly outdated - Docker is no longer required and conda may be used in place of it**
+
 Step-by-step notes are available here:
 https://confluence.slac.stanford.edu/display/PCDS/Installing+ads-deploy+on+Windows
 
@@ -38,28 +40,29 @@ Updating versions
 =================
 
 Steps to update ads-deploy:
-    1. Update ads-ioc-docker (follow its README)
-    2. Tag and release pytmc (use v0.0.0 style as usual)
-    3. Update the `FROM` pcdshub/ads-ioc version
-    4. Update environment variables: `PYTMC_VERSION`, `ADS_IOC_VERSION`
-    5. Rebuild. Match the `ADS_DEPLOY_VERSION` with the pytmc version, as it
-       tends to change the most:
-        ```
-        $ export ADS_DEPLOY_VERSION={pytmc version}
-        $ docker build -t pcdshub/ads-deploy:${ADS_DEPLOY_VERSION} .
-        $ docker build -t pcdshub/ads-deploy:latest .
-        ```
-    6. Push to DockerHub
-        ```
-        $ docker push pcdshub/ads-deploy:${ADS_DEPLOY_VERSION}
-        $ docker push pcdshub/ads-deploy:latest
-        ```
-    7. Commit, tag, and push to GitHub
-        ```
-        $ git tag ${ADS_DEPLOY_VERSION}
-        $ git push
-        $ git push --tags
-        ```
+
+1. Update ads-ioc-docker (follow its README)
+2. Tag and release pytmc (use v0.0.0 style as usual)
+3. Update the `FROM` pcdshub/ads-ioc version
+4. Update environment variables: `PYTMC_VERSION`, `ADS_IOC_VERSION`
+5. Rebuild. Match the `ADS_DEPLOY_VERSION` with the pytmc version, as it
+   tends to change the most:
+    ```
+    $ export ADS_DEPLOY_VERSION={pytmc version}
+    $ docker build -t pcdshub/ads-deploy:${ADS_DEPLOY_VERSION} .
+    $ docker build -t pcdshub/ads-deploy:latest .
+    ```
+6. Push to DockerHub
+    ```
+    $ docker push pcdshub/ads-deploy:${ADS_DEPLOY_VERSION}
+    $ docker push pcdshub/ads-deploy:latest
+    ```
+7. Commit, tag, and push to GitHub
+    ```
+    $ git tag ${ADS_DEPLOY_VERSION}
+    $ git push
+    $ git push --tags
+    ```
 
 Links
 =====
