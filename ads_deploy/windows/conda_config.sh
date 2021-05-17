@@ -1,1 +1,1 @@
-export ADS_DEPLOY_CONDA_ENV=ads-deploy-2.6.5
+export ADS_DEPLOY_CONDA_ENV=ads-deploy-2.9.1
