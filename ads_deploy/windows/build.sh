@@ -26,7 +26,7 @@ source "${SCRIPT_PATH}/conda_config.sh"
 conda activate $ADS_DEPLOY_CONDA_ENV
 
 # Fix the path for the Makefile, as we ignore it in the following step anyway:
-sed -i -e 's#^IOC_TOP\s*=\s*C:.*R\(.*\)\s*$#IOC_TOP=/reg/g/pcds/epics/ioc/common/ads-ioc/\1#' Makefile
+sed -i -e 's#^IOC_TOP\s*=\s*C:.*\(R.*\)\s*$#IOC_TOP=/reg/g/pcds/epics/ioc/common/ads-ioc/\1#' Makefile
 
 # Temporarily replace ADS_IOC in the Makefile to point to WINDOWS_ADS_IOC_TOP:
 make IOC_TOP="${ADS_IOC_PATH}/" TEMPLATE_PATH="${ADS_IOC_PATH}/iocBoot/templates" build clean
