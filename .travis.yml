@@ -11,10 +11,10 @@ env:
     - DOCS_REQUIREMENTS="dev-requirements.txt requirements.txt"
     # Options to be passed to flake8 for package linting. Usually this is just
     # the package name but you can enable other flake8 options via this config
-    - PYTHON_LINT_OPTIONS="ads-deploy"
+    - PYTHON_LINT_OPTIONS="ads_deploy"
 
     # The name of the conda package
-    - CONDA_PACKAGE="ads-deploy"
+    - CONDA_PACKAGE="ads_deploy"
     # The folder containing the conda recipe (meta.yaml)
     - CONDA_RECIPE_FOLDER="conda-recipe"
 
