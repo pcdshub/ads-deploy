@@ -69,7 +69,7 @@ pause
 write_script(
     'windows_run-typhos-gui.cmd',
     pause=False,
-    header=f'''\
+    header='''\
 Starting typhos...
 ''',
 

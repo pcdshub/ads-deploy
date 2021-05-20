@@ -1,7 +1,7 @@
 {% set data = load_setup_py_data() %}
 
 package:
-  name: ads-deploy
+  name: ads_deploy
   version : {{ data.get('version') }}
 
 source:
@@ -20,6 +20,7 @@ requirements:
     - pip
   run:
     - python >=3.6
+    - jinja2 <3.0
     - pytmc >=2.6.9
     - typhos >=1.0
 
