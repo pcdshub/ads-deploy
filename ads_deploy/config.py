@@ -55,7 +55,7 @@ def write_deploy_config(solution_path, projects, write_net_id, ip_addresses):
 
         ip_error = None
         if not ip_addresses:
-            print(f'local_net_id = "UNKNOWN"', file=f)
+            print('local_net_id = "UNKNOWN"', file=f)
             ip_error = '\n'.join(
                 ('Unable to find an IP address to match with the local NetID.',
                  'This must be set for the IOC to work.')
