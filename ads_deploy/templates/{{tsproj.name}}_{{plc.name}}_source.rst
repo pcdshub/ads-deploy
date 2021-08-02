@@ -12,5 +12,14 @@
 
     {{ source.get_source_code() | indent(4) }}
 
+
+{% set related = source.get_source_code() | related_source(source_name, tsproj, plc) %}
+{% if related %}
+Related:
+{% for item in related %}
+    * {{ item }}
+{% endfor %}
+{% endif %}
+
 {% endfor %}{# for dut_name, ... #}
 {% endfor %}{# for source_dict ... #}

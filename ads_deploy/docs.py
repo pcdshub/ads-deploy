@@ -15,6 +15,7 @@ continuous integration.  LCLS maintains its own tools for that in
 import argparse
 import logging
 import pathlib
+import re
 
 import jinja2
 
@@ -146,12 +147,43 @@ def get_jinja_environment(templates):
         lstrip_blocks=True,
     )
 
+    name_cache = {}
+    saw_tsproj = set()
+
     @jinja2.evalcontextfilter
     def title_fill(eval_ctx, text, fill_char):
         return fill_char * len(text)
 
+    @jinja2.evalcontextfilter
+    def related_source(eval_ctx, text, source_name, tsproj, plc):
+        tsproj = tsproj["obj"]
+        plc = plc["obj"]
+        if tsproj not in saw_tsproj:
+            saw_tsproj.add(tsproj)
+            to_cache = [
+                ("DUTs", plc.dut_by_name),
+                ("GVLs", plc.gvl_by_name),
+                ("POUs", plc.pou_by_name),
+            ]
+            for plc in tsproj.plcs:
+                for _, source_dict in to_cache:
+                    for source_name in source_dict:
+                        regex = re.compile(rf"\b{source_name}\b")
+                        name_cache[regex] = source_name
+        related = set(
+            name
+            for regex, name in name_cache.items()
+            if regex.search(text)
+        )
+
+        return [
+            f"`{name}`_" for name in sorted(related)
+            if name != source_name
+        ]
+
     jinja_env.globals['config_to_pragma'] = config_to_pragma
     jinja_env.filters['title_fill'] = title_fill
+    jinja_env.filters['related_source'] = related_source
     return jinja_env
 
 
