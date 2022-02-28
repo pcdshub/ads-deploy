@@ -155,6 +155,16 @@ def get_jinja_environment(templates):
         return fill_char * len(text)
 
     @jinja2.evalcontextfilter
+    def link_known(eval_ctx, text):
+        text = text.replace("\t", "    ")
+        text = text.replace(" ", "&nbsp;")
+        for regex, name in name_cache.items():
+            text = regex.sub(
+                f'<a class="coderef" href="#{name}">{name}</a>', text
+            )
+        return text
+
+    @jinja2.evalcontextfilter
     def related_source(eval_ctx, text, source_name, tsproj, plc):
         tsproj = tsproj["obj"]
         plc = plc["obj"]
@@ -177,13 +187,14 @@ def get_jinja_environment(templates):
         )
 
         return [
-            f"`{name}`_" for name in sorted(related)
+            name for name in sorted(related)
             if name != source_name
         ]
 
     jinja_env.globals['config_to_pragma'] = config_to_pragma
     jinja_env.filters['title_fill'] = title_fill
     jinja_env.filters['related_source'] = related_source
+    jinja_env.filters['link_known'] = link_known
     return jinja_env
 
 
