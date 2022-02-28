@@ -2,9 +2,11 @@
 
 {{ util.section('Data Types') }}
 
-{% set data_types = plc.data_types %}
+{% set plc_data_types = get_data_types(plc.obj) %}
+{% set tmc_data_types = enumerate_types(plc.obj.tmc) | list %}
+{% set data_types = plc_data_types + tmc_data_types %}
 
-{% for data_type in plc.data_types | sort(attribute="qualified_type_name") %}
+{% for data_type in data_types | sort(attribute="qualified_type_name") %}
 {% if data_type.records %}
 
 {% set subsection_name %}{{ data_type.qualified_type_name }}{% endset %}

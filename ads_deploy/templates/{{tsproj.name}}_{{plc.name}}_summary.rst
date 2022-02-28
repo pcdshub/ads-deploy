@@ -50,14 +50,15 @@ Total linter errors: {{ plc.pragma_errors }}
     :header: Library, Vendor, Default, Version
     :align: center
 
-    {% for item in plc.libraries | sort(attribute="name") %}
+    {% for item in get_simple_library_versions(plc.obj) | sort(attribute="name") %}
         {{ item.name }}, {{ item.vendor }}, {{ item.default }}, {{ item.version }}
     {% endfor %}{# for library... #}
 
 {{ util.section("Symbols") }}
 
+{% set symbols = get_symbols(plc.obj) %}
 
-{% for group, symbols in plc.symbols | groupby(attribute="top_level_group") %}
+{% for group, symbols in symbols | groupby(attribute="top_level_group") %}
 
     {{- util.subsection(group) }}
 
