@@ -1,4 +1,4 @@
-pytmc>=2.6.9
+pytmc>=2.11.0
 typhos>=1.0
 jinja2
 versioneer
