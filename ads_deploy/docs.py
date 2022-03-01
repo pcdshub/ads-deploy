@@ -8,14 +8,13 @@ continuous integration.  LCLS maintains its own tools for that in
 [pcds-ci-helpers](https://github.com/pcdshub/pcds-ci-helpers/).
 """
 
-# TODO: Thought for the future: this could be integrated into pytmc as part of
-# the `pytmc stcmd` refactor into `pytmc template`, with the additional render
-# context arguments provided here.
-
 import argparse
+import functools
 import logging
 import pathlib
 import re
+import sys
+from typing import Callable, Dict, List, Optional, Union
 
 import jinja2
 
@@ -24,15 +23,17 @@ import pytmc.bin.db
 import pytmc.bin.pragmalint
 import pytmc.bin.summary
 from pytmc import parser as pytmc_parser
+from pytmc.bin.template import get_boxes
+from pytmc.bin.template import get_jinja_filters as get_pytmc_jinja_filters
+from pytmc.bin.template import (get_linter_results, get_plc_records,
+                                get_render_context, helpers)
 
 from . import util
 
-# from . import templates as templates_module
-
 DESCRIPTION = __doc__
 MODULE_PATH = pathlib.Path(__file__).parent
-TEMPLATE_PATH = MODULE_PATH / 'templates'
-DEFAULT_TEMPLATES = list(TEMPLATE_PATH.glob('*.rst'))
+TEMPLATE_PATH = MODULE_PATH / "templates"
+DEFAULT_TEMPLATES = list(TEMPLATE_PATH.glob("*.rst"))
 logger = logging.getLogger(__name__)
 
 
@@ -44,120 +45,178 @@ def build_arg_parser(parser=None):
     parser.formatter_class = argparse.RawTextHelpFormatter
 
     parser.add_argument(
-        'project', metavar="INPUT",
-        type=argparse.FileType('rt', encoding='utf-8'),
-        help='Path to the solution (.sln) or project (.tsproj) file'
-    )
-
-    parser.add_argument(
-        '--plcs',
+        "project",
+        metavar="INPUT",
         type=str,
-        action='append',
-        help='Specify one or more PLC names to generate specifically'
+        help="Path to the solution (.sln) or project (.tsproj) file",
     )
 
     parser.add_argument(
-        '--template',
-        dest='templates',
+        "--plcs",
         type=str,
-        action='append',
-        help='Specify the template (or templates) for documentation'
+        action="append",
+        help="Specify one or more PLC names to generate specifically",
     )
 
     parser.add_argument(
-        '--dbd',
-        '-d',
+        "--template",
+        dest="templates",
+        type=str,
+        action="append",
+        help="Specify the template (or templates) for documentation",
+    )
+
+    parser.add_argument(
+        "--dbd",
+        "-d",
         default=None,
         type=str,
-        help='Specify an expanded .dbd file for validating record fields'
+        help="Specify an expanded .dbd file for validating record fields",
     )
 
     parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help='Dry-run only - do not write files'
+        "--dry-run", action="store_true",
+        help="Dry-run only - do not write files"
     )
 
     parser.add_argument(
-        '--output',
-        dest='output_path',
-        default='.',
+        "--output",
+        dest="output_path",
+        default=".",
         type=str,
-        help='Write documentation to this location'
+        help="Write documentation to this location",
     )
 
     return parser
 
 
-def lint_plc(plc_project):
-    pragma_count = 0
-    linter_errors = 0
-    results = []
+def build_template_kwargs(
+    solution_path: pathlib.Path,
+    projects: List[pathlib.Path],
+    *,
+    plcs: Optional[List[str]] = None,
+    dbd: Optional[str] = None
+) -> dict:
+    """
+    Get the top-level template rendering context dictionary.
 
-    for fn, source in plc_project.source.items():
-        for info in pytmc.bin.pragmalint.lint_source(fn, source):
-            pragma_count += 1
-            if info.exception is not None:
-                linter_errors += 1
-                results.append(info)
+    Parameters
+    ----------
+    solution_path : pathlib.Path
+        The path to the solution file.
 
-    return {'pragma_count': pragma_count,
-            'pragma_errors': linter_errors,
-            'linter_results': results}
+    projects : list of pathlib.Path
+        The projects from the solution.
+
+    plcs : list of str, optional
+        List of PLC names to limit to.
+
+    dbd : str, optional
+        The database definition path, if available.
+
+    Returns
+    -------
+    dict
+        The dictionary used to render all documentation templates.
+    """
+    solution_name = solution_path.stem if solution_path is not None else None
+    render_args = {
+        "solution": solution_path,
+        "solution_name": solution_name,
+        "tsprojects": [],
+    }
+
+    for tsproj_project in projects:
+        parsed_tsproj = pytmc.parser.parse(tsproj_project)
+
+        box_by_id = {
+            int(box.attributes["Id"]): box
+            for box in get_boxes(parsed_tsproj)
+        }
+        proj_info = dict(
+            directory=tsproj_project.parent,
+            name=tsproj_project.stem,
+            filename=tsproj_project.name,
+            plcs=[],  # Filled below
+            obj=parsed_tsproj,
+            nc=list(parsed_tsproj.find(pytmc_parser.NC)),
+            box_by_id=box_by_id,
+        )
+
+        render_args["tsprojects"].append(proj_info)
+        for plc_name, plc_project in parsed_tsproj.plcs_by_name.items():
+            logger.debug("Project: %s PLC: %s", tsproj_project, plc_name)
+
+            if plcs and plc_name not in plcs:
+                logger.debug("Skipping; not in valid list: %s", plcs)
+                continue
+
+            records, record_exceptions = get_plc_records(plc_project, dbd)
+            plc_info = dict(
+                name=plc_name,
+                obj=plc_project,
+                tmc_path=plc_project.tmc_path,
+                records=records,
+                record_exceptions=record_exceptions,
+            )
+
+            logger.debug(
+                "Records for %s: %d",
+                plc_name,
+                len(records) if records else 0
+            )
+            proj_info["plcs"].append(plc_info)
+
+            plc_info.update(**get_linter_results(plc_project))
+
+    return render_args
 
 
-def config_to_pragma(config, skip_desc=True, skip_pv=True):
-    if not config:
-        return
-
-    for key, value in config.items():
-        if key == 'archive':
-            seconds = value.get('seconds', 'unknown')
-            method = value.get('method', 'unknown')
-            fields = value.get('fields', {'VAL'})
-            if seconds != 1 or method != 'scan':
-                yield ('archive', f'{seconds}s {method}')
-            if fields != {'VAL'}:
-                yield ('archive_fields', ' '.join(fields))
-        elif key == 'update':
-            frequency = value.get('frequency', 1)
-            method = value.get('method', 'unknown')
-            if frequency != 1 or method != 'poll':
-                yield (key, f'{frequency}hz {method}')
-        elif key == 'field':
-            for field, value in value.items():
-                if field != 'DESC' or not skip_desc:
-                    yield ('field', f'{field} {value}')
-        elif key == 'pv':
-            if not skip_pv:
-                yield (key, ':'.join(value))
-        else:
-            yield (key, value)
-
-
-def get_jinja_environment(templates):
+def get_jinja_environment(
+    templates: List[pathlib.Path],
+    trim_blocks: bool = True,
+    lstrip_blocks: bool = True,
+    **env_kwargs,
+) -> jinja2.Environment:
+    """Environment for expanding filename templates."""
     template_dirs = set(str(item.parent) for item in templates)
-
-    loader = jinja2.ChoiceLoader([jinja2.FileSystemLoader(str(path))
-                                  for path in template_dirs])
-
-    jinja_env = jinja2.Environment(
-        loader=loader,
-        trim_blocks=True,
-        lstrip_blocks=True,
+    loader = jinja2.ChoiceLoader(
+        [jinja2.FileSystemLoader(str(path)) for path in template_dirs]
     )
 
-    name_cache = {}
+    env = jinja2.Environment(
+        loader=loader,
+        trim_blocks=trim_blocks,
+        lstrip_blocks=lstrip_blocks,
+        **env_kwargs,
+    )
+    env.filters.update(get_jinja_filters())
+    return env
+
+
+def get_jinja_filename_environment(templates) -> jinja2.Environment:
+    """Environment for expanding filename templates."""
+    loader = jinja2.DictLoader(
+        {template.name: template.name for template in templates}
+    )
+    return jinja2.Environment(
+        loader=loader, trim_blocks=True, lstrip_blocks=True
+    )
+
+
+def get_jinja_filters() -> Dict[str, Callable]:
+    """ads-deploy jinja filters, including those from ``pytmc template``."""
     saw_tsproj = set()
+    name_cache = {}
 
     @jinja2.evalcontextfilter
-    def title_fill(eval_ctx, text, fill_char):
-        return fill_char * len(text)
-
-    @jinja2.evalcontextfilter
-    def related_source(eval_ctx, text, source_name, tsproj, plc):
-        tsproj = tsproj["obj"]
-        plc = plc["obj"]
+    def related_source(
+        eval_ctx,
+        text,
+        source_name: str,
+        tsproj: pytmc_parser.TcSmProject,
+        plc: pytmc_parser.Plc,
+    ):
         if tsproj not in saw_tsproj:
             saw_tsproj.add(tsproj)
             to_cache = [
@@ -181,91 +240,30 @@ def get_jinja_environment(templates):
             if name != source_name
         ]
 
-    jinja_env.globals['config_to_pragma'] = config_to_pragma
-    jinja_env.filters['title_fill'] = title_fill
-    jinja_env.filters['related_source'] = related_source
-    return jinja_env
-
-
-def get_jinja_filename_environment(templates):
-    loader = jinja2.DictLoader({template.name: template.name
-                                for template in templates})
-
-    return jinja2.Environment(
-        loader=loader,
-        trim_blocks=True,
-        lstrip_blocks=True,
+    filters = get_pytmc_jinja_filters()
+    filters.update(
+        {
+            key: value
+            for key, value in locals().items()
+            if not key.startswith("_") and callable(value)
+        }
     )
+    return filters
 
 
-if 'Entry' not in pytmc_parser.TWINCAT_TYPES:
-    class Entry(pytmc_parser.TwincatItem):
-        @property
-        def entry_type(self):
-            return getattr(self, 'Type', [None])[0]
-
-        @property
-        def comment(self):
-            return self.Comment[0].text if hasattr(self, 'Comment') else ''
-
-    class EtherCAT(pytmc_parser.TwincatItem):
-        ...
-
-    class Pdo(pytmc_parser.TwincatItem):
-        ...
-
-    pytmc_parser.Entry = Entry
-    pytmc_parser.Pdo = Pdo
-    pytmc_parser.EtherCAT = EtherCAT
+def render_template(
+    env: jinja2.Environment,
+    template: str,
+    context: dict
+) -> str:
+    """
+    Render a template given the jinja environment.
+    """
+    return env.from_string(template).render(context)
 
 
-def get_boxes(tsproj):
-    return {
-        int(box.attributes['Id']): box
-        for box in tsproj.find(pytmc_parser.Box)
-    }
-
-
-def get_symbols(plc_project):
-    symbols = set(plc_project.find(pytmc_parser.Symbol))
-
-    for symbol in symbols:
-        symbol.top_level_group = (
-            symbol.name.split('.')[0] if symbol.name else 'Unknown')
-    return symbols
-
-
-def get_plc_records(plc_project, dbd):
-    if plc_project.tmc is None:
-        return None, None
-
-    try:
-        packages, exceptions = pytmc.bin.db.process(
-            plc_project.tmc, dbd_file=dbd, allow_errors=True,
-            show_error_context=True,
-        )
-    except Exception:
-        logger.exception(
-            'Failed to create EPICS records'
-        )
-        return None, None
-
-    records = [
-        record
-        for package in packages
-        for record in package.records
-    ]
-
-    return records, exceptions
-
-
-def _clean_link(link):
-    link.a = tuple(value or '' for value in link.a)
-    link.b = tuple(value or '' for value in link.b)
-    return link
-
-
-def _build_library_versions(plc):
+def get_simple_library_versions(plc: pytmc_parser.Plc) -> List[dict]:
+    """Get library versions."""
     if 'DefaultResolution' not in pytmc_parser.TWINCAT_TYPES:
         return []
 
@@ -304,89 +302,28 @@ def _build_library_versions(plc):
     return list(libraries.values())
 
 
-def build_template_kwargs(solution_path, projects, *, plcs=None, dbd=None):
-    solution_name = solution_path.stem if solution_path is not None else None
-    render_args = {
-        'solution': solution_path,
-        'solution_name': solution_name,
-        'tsprojects': [],
-    }
-
-    for tsproj_project in projects:
-        parsed_tsproj = pytmc.parser.parse(tsproj_project)
-
-        proj_info = dict(
-            directory=tsproj_project.parent,
-            name=tsproj_project.stem,
-            filename=tsproj_project.name,
-            plcs=[],
-            obj=parsed_tsproj,
-            nc=list(parsed_tsproj.find(pytmc_parser.NC)),
-            box_by_id=get_boxes(parsed_tsproj),
-            links=[_clean_link(link) for link in
-                   parsed_tsproj.find(pytmc_parser.Link)],
-        )
-
-        render_args['tsprojects'].append(proj_info)
-        for plc_name, plc_project in parsed_tsproj.plcs_by_name.items():
-            logger.debug('Project: %s PLC: %s', tsproj_project, plc_name)
-
-            if plcs and plc_name not in plcs:
-                logger.debug('Skipping; not in valid list: %s', plcs)
-                continue
-
-            records, record_exceptions = get_plc_records(plc_project, dbd)
-            data_types = []
-            try:
-                # For now, combine project-level data types + tmc data types
-                proj_types = getattr(parsed_tsproj, 'DataTypes', [None])[0]
-                if proj_types is not None:
-                    data_types.extend(list(
-                        pytmc.bin.summary.enumerate_types(proj_types)
-                    ))
-
-                tmc = plc_project.tmc
-                if tmc is not None:
-                    data_types.extend(list(
-                        pytmc.bin.summary.enumerate_types(tmc)))
-            except Exception:
-                logger.exception('Failed to get data type information')
-
-            try:
-                libraries = _build_library_versions(plc_project)
-            except Exception:
-                logger.exception('Failed to aggregate library versions')
-                libraries = []
-
-            plc_info = dict(
-                name=plc_name,
-                obj=plc_project,
-                tmc_path=plc_project.tmc_path,
-                symbols=get_symbols(plc_project),
-                data_types=data_types,
-                records=records,
-                record_exceptions=record_exceptions,
-                libraries=libraries,
-            )
-
-            logger.debug('Records for %s: %d', plc_name,
-                         len(records) if records else 0)
-            proj_info['plcs'].append(plc_info)
-
-            plc_info.update(**lint_plc(plc_project))
-
-    return render_args
+if get_simple_library_versions not in helpers:
+    helpers.append(get_simple_library_versions)
 
 
-def main(project, output_path, *, plcs=None, templates=None, dbd=None,
-         dry_run=False):
+def main(
+    project: pathlib.Path,
+    output_path: Union[str, pathlib.Path],
+    *,
+    plcs: Optional[List[str]] = None,
+    templates: Optional[List[pathlib.Path]] = None,
+    dbd: Optional[str] = None,
+    dry_run: bool = False
+) -> None:
+    """
+    ``ads-deploy docs`` entrypoint.
+    """
     templates = [
-        pathlib.Path(item)
-        for item in (templates or DEFAULT_TEMPLATES)
+        pathlib.Path(item) for item in (templates or DEFAULT_TEMPLATES)
     ]
 
     if not templates:
-        raise ValueError('No templates provided.')
+        raise ValueError("No templates provided.")
 
     jinja_env = get_jinja_environment(templates)
     jinja_filename_env = get_jinja_filename_environment(templates)
@@ -394,48 +331,65 @@ def main(project, output_path, *, plcs=None, templates=None, dbd=None,
     output_path = pathlib.Path(output_path)
 
     if not output_path.is_dir():
-        raise ValueError(f'Output path is not a directory: {output_path}')
+        raise ValueError(f"Output path is not a directory: {output_path}")
 
-    solution_path, projects = util.get_tsprojects_from_filename(project.name)
+    project = pathlib.Path(project).resolve()
+    if not project.exists():
+        logger.error("Project does not exist: %s", project)
+        sys.exit(1)
+
+    solution_path, projects = util.get_tsprojects_from_filename(project)
 
     full_render_args = build_template_kwargs(
-        solution_path, projects, plcs=plcs, dbd=dbd)
+        solution_path, projects, plcs=plcs, dbd=dbd
+    )
 
-    def write_file(template_path, render_args, template_type=''):
-        target_filename = jinja_filename_env.get_template(
-            template_path.name).render(**render_args)
+    @functools.lru_cache
+    def get_template_source(template_path: pathlib.Path) -> str:
+        with open(template_path, "rt") as fp:
+            return fp.read()
 
-        logger.info('Rendering %s template: %s -> %s',
-                    template_type,
-                    template_path.name,
-                    target_filename)
+    def write_file(template_path, render_args, template_type=""):
+        tpl = jinja_filename_env.get_template(template_path.name)
+        target_filename = tpl.render(**render_args)
 
-        template = jinja_env.get_template(template_path.name)
-        contents = template.render(**render_args)
+        logger.info(
+            "Rendering %s template: %s -> %s",
+            template_type,
+            template_path.name,
+            target_filename,
+        )
+
+        # template = jinja_env.get_template(template_path.name)
+        template = get_template_source(template_path)
+        # contents = template.render(**render_args)
+        ctx = dict(get_render_context())
+        ctx.update(render_args)
+        contents = render_template(jinja_env, template, context=ctx)
         if dry_run:
-            print('** dry run ** file:', target_filename)
+            print("** dry run ** file:", target_filename)
             print(contents)
         else:
-            with open(output_path / target_filename, 'wt') as f:
+            with open(output_path / target_filename, "wt") as f:
                 f.write(contents)
 
-    logger.debug('All templates: %s', templates)
+    logger.debug("All templates: %s", templates)
     for template_path in templates:
-        if '{plc' in template_path.name.replace(' ', ''):
+        if "{plc" in template_path.name.replace(" ", ""):
             # A bit of hacking: generate template per PLC
-            for tsproj in full_render_args['tsprojects']:
-                for plc in tsproj['plcs']:
+            for tsproj in full_render_args["tsprojects"]:
+                for plc in tsproj["plcs"]:
                     render_args = dict(full_render_args)
-                    render_args['tsproj'] = tsproj
-                    render_args['plc'] = plc
-                    write_file(template_path, render_args, 'per-PLC')
-        elif '{tsproj' in template_path.name.replace(' ', ''):
+                    render_args["tsproj"] = tsproj
+                    render_args["plc"] = plc
+                    write_file(template_path, render_args, "per-PLC")
+        elif "{tsproj" in template_path.name.replace(" ", ""):
             # A bit of hacking: generate template per tsproj
-            for tsproj in full_render_args['tsprojects']:
+            for tsproj in full_render_args["tsprojects"]:
                 render_args = dict(full_render_args)
-                render_args['tsproj'] = tsproj
-                write_file(template_path, render_args, 'per-tsproj')
+                render_args["tsproj"] = tsproj
+                write_file(template_path, render_args, "per-tsproj")
         else:
-            write_file(template_path, full_render_args, 'general')
+            write_file(template_path, full_render_args, "general")
 
-    logger.info('Done')
+    logger.info("Done")

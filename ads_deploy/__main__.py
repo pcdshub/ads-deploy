@@ -38,17 +38,17 @@ def _build_commands():
         try:
             mod = _try_import(module)
         except Exception as ex:
-            unavailable.append((module, ex))
+            unavailable.append((command, ex))
         else:
             result[command] = (mod.build_arg_parser, mod.main)
             DESCRIPTION += f'\n    $ ads-deploy {command} --help'
 
     if unavailable:
-        DESCRIPTION += '\n\n'
+        DESCRIPTION += '\n'
 
-        for module, ex in unavailable:
+        for command, ex in unavailable:
             DESCRIPTION += (
-                f'WARNING: ads_deploy {command!r} is unavailable due to:'
+                f'\nWARNING: "ads-deploy {command}" is unavailable due to:'
                 f'\n\t{ex.__class__.__name__}: {ex}'
             )
 
