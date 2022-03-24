@@ -342,7 +342,7 @@ def main(
         solution_path, projects, plcs=plcs, dbd=dbd
     )
 
-    @functools.lru_cache
+    @functools.lru_cache(maxsize=None)
     def get_template_source(template_path: pathlib.Path) -> str:
         with open(template_path, "rt") as fp:
             return fp.read()
