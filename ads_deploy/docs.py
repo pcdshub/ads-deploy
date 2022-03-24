@@ -209,9 +209,7 @@ def get_jinja_filters() -> Dict[str, Callable]:
     saw_tsproj = set()
     name_cache = {}
 
-    @jinja2.evalcontextfilter
     def related_source(
-        eval_ctx,
         text,
         source_name: str,
         tsproj: pytmc_parser.TcSmProject,
