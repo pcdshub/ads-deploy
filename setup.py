@@ -50,6 +50,7 @@ setup(
     packages=find_packages(exclude=['docs', 'tests']),
     description='TwinCAT ADS EPICS IOC deployment tools',
     long_description=readme,
+    long_description_content_type='text/markdown',
     url='https://github.com/pcdshub/ads-deploy',
     entry_points={'console_scripts': ['ads-deploy=ads_deploy.__main__:main']},
     include_package_data=True,
