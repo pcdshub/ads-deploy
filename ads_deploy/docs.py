@@ -209,9 +209,7 @@ def get_jinja_filters() -> Dict[str, Callable]:
     saw_tsproj = set()
     name_cache = {}
 
-    @jinja2.evalcontextfilter
     def related_source(
-        eval_ctx,
         text,
         source_name: str,
         tsproj: pytmc_parser.TcSmProject,
@@ -344,7 +342,7 @@ def main(
         solution_path, projects, plcs=plcs, dbd=dbd
     )
 
-    @functools.lru_cache
+    @functools.lru_cache(maxsize=None)
     def get_template_source(template_path: pathlib.Path) -> str:
         with open(template_path, "rt") as fp:
             return fp.read()
