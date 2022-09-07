@@ -8,11 +8,10 @@ import logging
 import threading
 import time
 
+import pytmc
 from caproto.server import PVGroup, pvproperty
 from caproto.server import run as caproto_run
 from caproto.server import template_arg_parser
-
-import pytmc
 
 from . import typhos_gui, util
 

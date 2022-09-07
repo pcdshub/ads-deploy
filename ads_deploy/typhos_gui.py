@@ -7,11 +7,10 @@ import argparse
 import logging
 
 import ophyd
-import typhos
-import typhos.cli
-
 import pytmc
 import pytmc.bin.stcmd
+import typhos
+import typhos.cli
 from pytmc.bin.db import process
 
 from . import util

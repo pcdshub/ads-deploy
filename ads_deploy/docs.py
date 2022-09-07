@@ -17,7 +17,6 @@ import sys
 from typing import Callable, Dict, List, Optional, Union
 
 import jinja2
-
 import pytmc
 import pytmc.bin.db
 import pytmc.bin.pragmalint
