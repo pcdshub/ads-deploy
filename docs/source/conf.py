@@ -14,7 +14,9 @@
 #
 import os
 import sys
-import sphinx_rtd_theme
+from datetime import datetime
+
+import sphinx_rtd_theme  # noqa
 
 module_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                            '../../')
@@ -25,7 +27,6 @@ sys.path.insert(0, module_path)
 project = 'ads_deploy'
 author = 'SLAC National Accelerator Laboratory'
 
-from datetime import datetime
 year = datetime.now().year
 copyright = str(year) + ', SLAC National Accelerator Laboratory'
 

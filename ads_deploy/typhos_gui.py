@@ -9,10 +9,9 @@ import logging
 import ophyd
 import pytmc
 import pytmc.bin.stcmd
-from pytmc.bin.db import process
-
 import typhos
 import typhos.cli
+from pytmc.bin.db import process
 
 from . import util
 

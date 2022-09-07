@@ -103,6 +103,6 @@ ENV/
 # vim swap files
 *.swp
 
-# None of the logs 
+# None of the logs
 /logs/*
 .DS_Store
