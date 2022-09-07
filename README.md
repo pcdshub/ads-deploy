@@ -2,7 +2,7 @@ ads-deploy docker image + tools
 ===============================
 
 ads-deploy bridges the gap between your PLC project in TwinCAT XAE + Visual Studio and the
-Python/EPICS tools we use for development and deployment ([PyTMC](https://github.com/slaclab/pytmc), 
+Python/EPICS tools we use for development and deployment ([PyTMC](https://github.com/slaclab/pytmc),
 [ads-ioc](https://github.com/pcdshub/ads-ioc)) by providing a full EPICS and Python environment
 in a containerized Docker image.
 
