@@ -3,7 +3,11 @@
 {{ util.section('Data Types') }}
 
 {% set plc_data_types = get_data_types(plc.obj) %}
+{% if plc.obj.tmc %}
 {% set tmc_data_types = enumerate_types(plc.obj.tmc) | list %}
+{% else %}
+{% set tmc_data_types = [] %}
+{% endif %}
 {% set data_types = plc_data_types + tmc_data_types %}
 
 {% for data_type in data_types | sort(attribute="qualified_type_name") %}
@@ -51,7 +55,7 @@
       - Type
       - Description
       - Pragma
-    {% for record in records | sort(attribute="pvname") %}
+    {% for record_name, record in records.items() %}
     {% set package = record.package %}
     {% set extended_description %}
 {{ record.long_description | default(record.fields.DESC) }}{% if package.linked_to_pv %}; Linked to PV: {{package.linked_to_pv}}{% endif %}

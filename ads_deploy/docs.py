@@ -22,10 +22,11 @@ import pytmc
 import pytmc.bin.db
 import pytmc.bin.pragmalint
 import pytmc.bin.summary
+from pytmc import RecordPackage
 from pytmc import parser as pytmc_parser
 from pytmc.bin.template import get_boxes
 from pytmc.bin.template import get_jinja_filters as get_pytmc_jinja_filters
-from pytmc.bin.template import (get_linter_results, get_plc_records,
+from pytmc.bin.template import (get_linter_results, get_plc_record_packages,
                                 get_render_context, helpers)
 
 from . import util
@@ -151,19 +152,33 @@ def build_template_kwargs(
                 logger.debug("Skipping; not in valid list: %s", plcs)
                 continue
 
-            records, record_exceptions = get_plc_records(plc_project, dbd)
+            packages, record_exceptions = get_plc_record_packages(plc_project, dbd)
+            packages = packages or []
+            record_exceptions = record_exceptions or []
+
+            def by_tcname(package: RecordPackage):
+                return package.tcname
+
+            records = {
+                record.pvname: record
+                for package in sorted(packages, key=by_tcname)
+                for record in package.records
+            }
             plc_info = dict(
                 name=plc_name,
                 obj=plc_project,
                 tmc_path=plc_project.tmc_path,
+                record_packages=packages,
                 records=records,
                 record_exceptions=record_exceptions,
             )
 
             logger.debug(
-                "Records for %s: %d",
+                "%s: packages=%d records=%d errors=%d",
                 plc_name,
-                len(records) if records else 0
+                len(packages),
+                len(records),
+                len(record_exceptions),
             )
             proj_info["plcs"].append(plc_info)
 
