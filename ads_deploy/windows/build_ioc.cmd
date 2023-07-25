@@ -12,7 +12,7 @@ IF %AdsDeployUseDocker% EQU 1 (
     @echo - Attempting to build the IOC
     %RunDocker% %DockerImage% "find '%IocMountPath%/iocBoot' -type d -maxdepth 1 -name 'ioc*' -exec make -C {} \;"
 ) ELSE (
-    bash --login -c "find '%SolutionDir:\=/%/iocBoot' -type d -maxdepth 1 -name 'ioc*' -exec bash --login %AdsDeployWindowsScripts:\=/%/build.sh '{}' '%WINDOWS_ADS_IOC_TOP:\=/%/' \;"
+    C:\miniconda\envs\ads-deploy-2.9.1\Library\usr\bin\bash.exe --login -c "find '%SolutionDir:\=/%/iocBoot' -type d -maxdepth 1 -name 'ioc*' -exec bash --login %AdsDeployWindowsScripts:\=/%/build.sh '{}' '%WINDOWS_ADS_IOC_TOP:\=/%/' \;"
 )
 
 if %ERRORLEVEL% NEQ 0 (
